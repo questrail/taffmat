@@ -150,6 +150,9 @@ def read_taffmat(input_file):
     header_data['comment'] = raw_header_data['comment']
     header_data['number_of_series'] = int(raw_header_data['num_series'])
     header_data['storage_mode'] = raw_header_data['storage_mode']
+    # The file_type lists how the data was recorded and saved in .dat
+    # INTEGER = 16 bit A/D = 2-byte integers
+    # LONG = 24 bit A/D = 4-byte integers
     header_data['file_type'] = raw_header_data['file_type']
     header_data['slope'] = [float(slope)
             for slope in raw_header_data['slope'].split(',')]
@@ -198,12 +201,6 @@ def read_taffmat(input_file):
     else:
         # Voice memo was not recored
         header_data['voice_memo_on'] = False
-    # FIXME: Need to change so that we can handle more than just
-    # LX-10 files. The Teac documentation states this will be one of:
-    # LX10_VERSION, LX20_VERSION, LX110_VERSION, or LX120_VERSION
-    # FIXME: If we change to handle LX-110 or LX-120, we'll probably
-    # need to change from assuming int16 to determing if the data
-    # was stored as either int16 or int32.
     # Determine the version of data recorder used to capture the data
     if 'lx10_version' in raw_header_data:
         header_data['recorder_model'] = 'LX10'
@@ -224,7 +221,14 @@ def read_taffmat(input_file):
     header_data['memo_length'] = raw_header_data['memo_length']
     header_data['memo'] = raw_header_data['memo']
 
-    # Time to process the dat file
+    # Determine if the .dat file saved the data using 2-bytes (int16)
+    # or 4-bytes (int32).
+    if header_data['file_type'] == 'INTEGER':
+        data_size = np.int16
+    elif header_data['file_type'] == 'LONG':
+        data_size = np.int32
+    else:
+        data_size = np.int16
     # Read the entire file and reshape the data so that each channel/series
     # is in its own row
     with open(inputdatfile, 'rb') as datfile:
