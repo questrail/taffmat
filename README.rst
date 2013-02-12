@@ -16,9 +16,9 @@ According to the Teac "LX Series Recording Unit Instruction Manual":
   file format composed of the following:
 
   * a data file containing A/D (analog to digital) converted data. The
-  file is binary formatwith the extension dat.
+    file is binary format with the extension dat.
   * a header file containing information such as recording
-  conditions. The file is in text format with the extension hdr. 
+    conditions. The file is in text format with the extension hdr. 
 
 TAFFmat is a trademark of Teac Corporation.
 

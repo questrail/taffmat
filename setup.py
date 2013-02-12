@@ -8,7 +8,7 @@ setup(
     url='http://github.com/questrail/taffmat',
     license='LICENSE.txt',
     description='Read and write Teac TAFFmat files.',
-    long_description=open('README.rst').read(),
+    long_description=open('README.rst', 'rt').read(),
     requires=['numpy (>=1.6.0)'],
     classifiers=[
         'Programming Language :: Python',
