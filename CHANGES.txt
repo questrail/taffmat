@@ -1,0 +1,11 @@
+Changelog
+=========
+
+develop (unreleased)
+--------------------
+
+0.1.0 (2012-02-11)
+------------------
+
+* Initial release has the ability to read/write LX-10 created
+  TAFFmat files.
