@@ -44,12 +44,8 @@ level is approximately +/-120%." [Source p. 4-5 of Teac manual]
 
 """
 
-# FIXME: Need to convert this from a module to its own package.
-
 # Try to future proof code so that it's Python 3.x ready
 from __future__ import print_function
-# unicode_literals caused a matplotlib failure I believe,
-# so watch for errors
 from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
@@ -193,15 +189,6 @@ def read_taffmat(input_file):
     # Right now I'm basically assuming they're not used in the data.
     header_data['start_trigger'] = raw_header_data['start_trigger']
     header_data['stop_condition'] = raw_header_data['stop_condition']
-    # FIXME: Need to change so that we can handle more than just
-    # LX-10 files. The Teac documentation states this will be one of:
-    # LX10_VERSION, LX20_VERSION, LX110_VERSION, or LX120_VERSION
-    # FIXME: If we change to handle LX-110 or LX-120, we'll probably
-    # need to change from assuming int16 to determing if the data
-    # was stored as either int16 or int32.
-    # FIXME: Need to handle both when the memo is ON and OFF.
-    # For memo on, we'll have a key of voice_memo in the raw_header_data
-    # dictionary, whereas, if the memo is off that key will not exist
     if 'voice_memo' in raw_header_data:
         # Voice memo was recorded
         header_data['voice_memo_on'] = True
@@ -211,7 +198,29 @@ def read_taffmat(input_file):
     else:
         # Voice memo was not recored
         header_data['voice_memo_on'] = False
-    header_data['lx10_version'] = raw_header_data['lx10_version']
+    # FIXME: Need to change so that we can handle more than just
+    # LX-10 files. The Teac documentation states this will be one of:
+    # LX10_VERSION, LX20_VERSION, LX110_VERSION, or LX120_VERSION
+    # FIXME: If we change to handle LX-110 or LX-120, we'll probably
+    # need to change from assuming int16 to determing if the data
+    # was stored as either int16 or int32.
+    # Determine the version of data recorder used to capture the data
+    if 'lx10_version' in raw_header_data:
+        header_data['recorder_model'] = 'LX10'
+        header_data['recorder_version'] = raw_header_data['lx10_version']
+    elif 'lx20_version' in raw_header_data:
+        header_data['recorder_model'] = 'LX20'
+        header_data['recorder_version'] = raw_header_data['lx20_version']
+    elif 'lx110_version' in raw_header_data:
+        header_data['recorder_model'] = 'LX110'
+        header_data['recorder_version'] = raw_header_data['lx110_version']
+    elif 'lx120_version' in raw_header_data:
+        header_data['recorder_model'] = 'LX120'
+        header_data['recorder_version'] = raw_header_data['lx120_version']
+    else:
+        header_data['recorder_model'] = 'Unrecognized data recorder model'
+        header_data['recorder_version'] = 'Unknown data recorder version'
+
     header_data['memo_length'] = raw_header_data['memo_length']
     header_data['memo'] = raw_header_data['memo']
 
@@ -264,9 +273,6 @@ def write_taffmat(data_array, header_data, output_base_filename):
     header_output.append('NUM_SAMPS {}\n'.format(header_data['number_of_samples']))
     header_output.append('DATA\n')
     header_output.append('DEVICE {}\n'.format(header_data['device']))
-    # FIXME: Need to add two spaces to the end of the firmware_version (8 fixed spaces)
-    # if the firmware_version is not blank. If the firmware_version is blank,
-    # then the line ends with the comma
     header_output.append('SLOT1_AMP {id},{num_ch},{pld_ver},{fw_ver}\n'.format(
         id=header_data['slot1_amp']['id_name'],
         num_ch=header_data['slot1_amp']['num_of_channels'],
@@ -300,8 +306,9 @@ def write_taffmat(data_array, header_data, output_base_filename):
         header_output.append('VOICE_MEMO {bits},{size}\n'.format(
             bits=header_data['voice_memo_bits_per_sample'],
             size=header_data['voice_memo_size_bytes']))
-    header_output.append('LX10_VERSION {ver}\n'.format(
-        ver=header_data['lx10_version']))
+    header_output.append('{model}_VERSION {ver}\n'.format(
+        model=header_data['recorder_model'],
+        ver=header_data['recorder_version']))
     header_output.append('MEMO_LENGTH {memo_len}\n'.format(
         memo_len=header_data['memo_length']))
     header_output.append('MEMO {memo}\n'.format(memo=header_data['memo']))

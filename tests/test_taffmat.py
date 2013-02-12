@@ -213,8 +213,8 @@ class TestWritingTAFFmatFile(unittest.TestCase):
             source_hdr_contents = hdr_source_file.read()
         with open(output_hdr, 'r') as hdr_output_file:
             output_hdr_contents = hdr_output_file.read()
-        # FIXME: Instead of stipping out all blank lines, I should probably
-        # only stip out blank lines that are at the end of the TAFFmat hdr file.
+        # FIXME: Instead of stripping out all blank lines, I should probably
+        # only strip out blank lines that are at the end of the TAFFmat hdr file.
         source_hdr_contents_no_blank_lines = filter(
                 lambda x: not re.match(r'^\s*$', x), source_hdr_contents)
         output_hdr_contents_no_blank_lines = filter(

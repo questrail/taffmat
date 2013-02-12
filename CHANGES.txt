@@ -3,9 +3,14 @@ Changelog
 
 develop (unreleased)
 --------------------
+* Modified README.rst
 
-0.1.0 (2012-02-11)
-------------------
+0.1.1 (February 11, 2013)
+-------------------------
+* Removed QuEST Rail LLC copyright.
+
+0.1.0 (February 11, 2013) 
+-------------------------
 
 * Initial release has the ability to read/write LX-10 created
   TAFFmat files.
