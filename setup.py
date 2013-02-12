@@ -1,7 +1,7 @@
 from distutils.core import setup
 setup(
     name='taffmat',
-    version='0.1.0',
+    version='0.1.1',
     author='Matthew Rankin',
     author_email='matthew@questrail.com',
     py_modules=['taffmat'],

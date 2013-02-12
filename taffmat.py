@@ -1,10 +1,7 @@
 #!/usr/bin/env python
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 """
 taffmat.py
-
-Created by Matthew Rankin on February 8, 2013
-Copyright (c) 2013 QuEST Rail LLC. All rights reserved.
 
 Read and write Teac TAFFmat files.
 
