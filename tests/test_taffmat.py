@@ -159,19 +159,19 @@ class TestReadingTAFFmatFile(unittest.TestCase):
 class TestWritingTAFFmatFile(unittest.TestCase):
 
     def setUp(self):
-        test_taffmat_directory = os.path.join(
+        self.test_taffmat_directory = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 'test_taffmat_files')
 
         # Read in the TAFFmat file under test
         self.input_base_filename = os.path.join(
-                test_taffmat_directory, 'UTEST001')
+                self.test_taffmat_directory, 'UTEST001')
         self.data_array, self.time_vector, self.header_data = \
                 taffmat.read_taffmat(self.input_base_filename)
 
         # Setup the output_basefilename
         self.output_base_filename = os.path.join(
-                test_taffmat_directory, 'test_output_taffmat')
+                self.test_taffmat_directory, 'test_output_taffmat')
 
         # Write the .dat and .hdr files using taffmat.py
         taffmat.write_taffmat(self.data_array, self.header_data, self.output_base_filename)
@@ -180,15 +180,15 @@ class TestWritingTAFFmatFile(unittest.TestCase):
         # Need to delete the test output file
         output_dat_filename = '{base}.dat'.format(base=self.output_base_filename)
         output_hdr_filename = '{base}.hdr'.format(base=self.output_base_filename)
-        #try:
-            #os.remove(output_dat_filename)
-        #except:
-            #print("Couldn't remove the test dat file.")
+        try:
+            os.remove(output_dat_filename)
+        except:
+            print("Couldn't remove the test dat file.")
 
-        #try:
-            #os.remove(output_hdr_filename)
-        #except:
-            #print("Couldn't remove the test hdr file.")
+        try:
+            os.remove(output_hdr_filename)
+        except:
+            print("Couldn't remove the test hdr file.")
 
     def _get_dat_hdr_filenames_from_base(self, base_filename):
         dat_filename = '{base}.dat'.format(base=base_filename)
@@ -223,8 +223,48 @@ class TestWritingTAFFmatFile(unittest.TestCase):
                 output_hdr_contents_no_blank_lines,
                 'Source and output header files are not the same (excluding blank lines).')
 
-    # TODO: Need to increase test coverage for reading and writing the various
-    # hdr and dat files, especially the slices.
+class TestWritingTAFFmatFileSlice(unittest.TestCase):
+
+    def setUp(self):
+        self.test_taffmat_directory = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                'test_taffmat_files')
+
+        # Read in the TAFFmat file under test
+        self.input_base_filename = os.path.join(
+                self.test_taffmat_directory, 'UTEST001')
+        self.data_array, self.time_vector, self.header_data = \
+                taffmat.read_taffmat(self.input_base_filename)
+
+    def test_writing_dat_file_slice(self):
+        '''
+        Write the first 1000 elements of data_array to a new .dat and .hdr file.
+        Then read the new .dat file and make sure it matches the first 1000
+        elements of the original data_array
+        '''
+
+        slice_output_base_filename = os.path.join(
+                self.test_taffmat_directory, 'test_slice_output_taffmat')
+
+        #number_of_samples_in_slice = self.data_array.shape[1]
+        number_of_samples_in_slice = 1000
+        original_data_array = np.copy(self.data_array[:,0:number_of_samples_in_slice])
+
+        # Write the TAFFmat data slice
+        taffmat.write_taffmat_slice(self.data_array, self.header_data,
+                slice_output_base_filename, 0, number_of_samples_in_slice-1)
+
+        # Read the TAFFmat data slice
+        slice_data_array, slice_time_vector, slice_header_data = \
+                taffmat.read_taffmat(slice_output_base_filename)
+
+        # Confirm the proper number of samples exist
+        self.assertEqual(slice_data_array.shape[1],number_of_samples_in_slice,
+                'Number of samples in slice incorrect.')
+
+        np.testing.assert_array_equal(slice_data_array,
+                original_data_array,
+                'The sliced data array does not equal the original data array.')
 
 
 if __name__ == '__main__':
