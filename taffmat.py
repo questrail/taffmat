@@ -253,51 +253,10 @@ def _read_taffmat_dat(input_dat_file, file_type, number_of_series,
 
     return (data_array)
 
-def read_taffmat(input_file):
-    # If the input_file contains the extension .dat or .hdr,
-    # strip that off to create the input_file_basename
-    # and then create both the .dat and .hdr filenames
-    input_file_basename, input_file_extension = os.path.splitext(
-            input_file)
-
-    if input_file_extension.lower() in ['.dat', '.hdr']:
-        # The input_file contained the extension of .dat or .hdr
-        input_dat_file = '{base}.dat'.format(base=input_file_basename)
-        input_hdr_file = '{base}.hdr'.format(base=input_file_basename)
-    else:
-        # The input_file didn't contain an extension, so append .dat and .hdr
-        # TODO: Add unit tests to make sure we're properly handling
-        # input_file with .dat, .hdr, or no extension
-        input_dat_file = '{base}.dat'.format(base=input_file)
-        input_hdr_file = '{base}.hdr'.format(base=input_file)
-
-    if not os.path.isfile(input_dat_file) or not os.path.isfile(input_hdr_file):
-        # The .dat or .hdr file doesn't exist, so exit
-        # FIXME: What error code, if any should I be returning?
-        return False
-
-    # Read the hdr file
-    header_data = _read_taffmat_hdr(input_hdr_file)
-
-    # Read the dat file
-    data_array = _read_taffmat_dat(input_dat_file, header_data['file_type'],
-            header_data['number_of_series'], header_data['slope'],
-            header_data['y_offset'])
-
-    # Create the time vector
-    time_vector = np.linspace(0, 
-            header_data['number_of_samples'] / header_data['sampling_frequency_hz'],
-            header_data['number_of_samples'])
-
-    # Return a tuple
-    return (data_array, time_vector, header_data)
-
-
-def write_taffmat(data_array, header_data, output_base_filename):
-
-    # Determine the output file names
-    output_hdr_filename = '{base}.hdr'.format(base=output_base_filename)
-    output_dat_filename = '{base}.dat'.format(base=output_base_filename)
+def _write_taffmat_hdr(header_data, output_hdr_filename):
+    '''
+    Write the TAFFmat .hdr file
+    '''
 
     # Convert "smart" dictionary items into strings that are
     # ready to be saved to the .hdr text file.
@@ -369,19 +328,84 @@ def write_taffmat(data_array, header_data, output_base_filename):
     with open(output_hdr_filename, 'w') as f_header:
         f_header.writelines(header_output)
 
+    return
+
+def _write_taffmat_dat(data_array, number_of_series, slope, y_offset,
+        output_dat_filename):
+    '''
+    Write the .dat TAFFmat file
+    '''
 
     # Convert data_array into int16 values by removing the offset
     # and slope, such that +/-100% = +/-25,000 int16
     # Then write the binary data file.
-    data_array = _remove_slope_and_offset(data_array,
-            header_data['number_of_series'],
-            header_data['slope'],
-            header_data['y_offset'])
+    data_array = _remove_slope_and_offset(data_array, number_of_series,
+            slope, y_offset)
     with open(output_dat_filename, 'wb') as datfile:
-        data_array.T.reshape((-1,header_data['number_of_series'])).tofile(datfile)
+        data_array.T.reshape((-1,number_of_series)).tofile(datfile)
 
     return
 
+def read_taffmat(input_file):
+    '''
+    Read the TAFFmat .hdr and .dat files
+    '''
+
+    # If the input_file contains the extension .dat or .hdr,
+    # strip that off to create the input_file_basename
+    # and then create both the .dat and .hdr filenames
+    input_file_basename, input_file_extension = os.path.splitext(
+            input_file)
+
+    if input_file_extension.lower() in ['.dat', '.hdr']:
+        # The input_file contained the extension of .dat or .hdr
+        input_dat_file = '{base}.dat'.format(base=input_file_basename)
+        input_hdr_file = '{base}.hdr'.format(base=input_file_basename)
+    else:
+        # The input_file didn't contain an extension, so append .dat and .hdr
+        # TODO: Add unit tests to make sure we're properly handling
+        # input_file with .dat, .hdr, or no extension
+        input_dat_file = '{base}.dat'.format(base=input_file)
+        input_hdr_file = '{base}.hdr'.format(base=input_file)
+
+    if not os.path.isfile(input_dat_file) or not os.path.isfile(input_hdr_file):
+        # The .dat or .hdr file doesn't exist, so exit
+        # FIXME: What error code, if any should I be returning?
+        return False
+
+    # Read the hdr file
+    header_data = _read_taffmat_hdr(input_hdr_file)
+
+    # Read the dat file
+    data_array = _read_taffmat_dat(input_dat_file, header_data['file_type'],
+            header_data['number_of_series'], header_data['slope'],
+            header_data['y_offset'])
+
+    # Create the time vector
+    time_vector = np.linspace(0, 
+            header_data['number_of_samples'] / header_data['sampling_frequency_hz'],
+            header_data['number_of_samples'])
+
+    # Return a tuple
+    return (data_array, time_vector, header_data)
+
+
+
+def write_taffmat(data_array, header_data, output_base_filename):
+    '''
+    Write the TAFFmat .dat and .hdr files
+    '''
+
+    # Determine the output file names
+    output_hdr_filename = '{base}.hdr'.format(base=output_base_filename)
+    output_dat_filename = '{base}.dat'.format(base=output_base_filename)
+
+    _write_taffmat_hdr(header_data, output_hdr_filename)
+    _write_taffmat_dat(data_array, header_data['number_of_series'],
+            header_data['slope'], header_data['y_offset'],
+            output_dat_filename)
+
+    return
 
 if __name__ == "__main__":
     import argparse
