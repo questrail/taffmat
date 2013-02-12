@@ -58,6 +58,18 @@ from collections import OrderedDict
 # Data analysis related imports
 import numpy as np
 
+def _append_windows_newlines(input_list_of_strings):
+    '''
+    Given a list of strings append the Windows new line character
+    to each string and return the new list
+    '''
+    windows_newline_character = '\r\n'
+    output_list_of_strings = []
+    for line in input_list_of_strings:
+        output_list_of_strings.append(line + windows_newline_character)
+
+    return output_list_of_strings
+
 def _apply_slope_and_offset(data_array, number_of_series, slope, y_offset):
     """
     Convert from int16 to float64 and apply the slope and offset
@@ -75,7 +87,6 @@ def _remove_slope_and_offset(data_array, number_of_series, slope, y_offset):
     Convert data_array from float64 to int16 by removing the slope and offset
     in preparation to writing the TAFFmat .dat file
     """
-    print(type(y_offset[0]))
     for series in range(0, number_of_series):
         data_array[series] = np.around((data_array[series] - y_offset[series]) /
                 slope[series])
@@ -98,7 +109,6 @@ def _format_exponent_notation(input_number, precision, num_exponent_digits):
     python_exponent_notation = '{number:.{precision}e}'.format(
             number=input_number,
             precision=precision)
-    print("Here 1", python_exponent_notation)
     mantissa, exponent = python_exponent_notation.split('e')
     # Add 1 to the desired number of exponenent digits to account for the sign
     return '{mantissa}e{exponent:+0{exp_num}d}'.format(
@@ -261,33 +271,33 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
     # Convert "smart" dictionary items into strings that are
     # ready to be saved to the .hdr text file.
     header_output = []
-    header_output.append('DATASET ' + header_data['dataset'] + '\n')
-    header_output.append('VERSION ' + str(header_data['version']) + '\n')
-    header_output.append('SERIES ' + ','.join(header_data['series_labels']) + ' \n')
-    header_output.append('DATE ' + header_data['recording_start_datetime'].strftime('%m-%d-%Y') + '\n')
+    header_output.append('DATASET {}'.format(header_data['dataset']))
+    header_output.append('VERSION {}'.format(header_data['version']))
+    header_output.append('SERIES ' + ','.join(header_data['series_labels']) + ' ')
+    header_output.append('DATE ' + header_data['recording_start_datetime'].strftime('%m-%d-%Y'))
     header_output.append('TIME ' + 
-            header_data['recording_start_datetime'].strftime('%H:%M:%S.%f')[0:11] + '\n')
-    header_output.append('RATE ' + str(header_data['sampling_frequency_hz']) + '\n')
-    header_output.append('VERT_UNITS ' + ','.join(header_data['vertical_units']) + ' \n')
-    header_output.append('HORZ_UNITS ' + header_data['horizontal_units'] + '\n')
-    header_output.append('COMMENT ' + header_data['comment'] + '\n')
-    header_output.append('NUM_SERIES ' + str(header_data['number_of_series']) + '\n')
-    header_output.append('STORAGE_MODE ' + header_data['storage_mode'] + '\n')
-    header_output.append('FILE_TYPE ' + header_data['file_type'] + '\n')
+            header_data['recording_start_datetime'].strftime('%H:%M:%S.%f')[0:11])
+    header_output.append('RATE ' + str(header_data['sampling_frequency_hz']))
+    header_output.append('VERT_UNITS ' + ','.join(header_data['vertical_units']) + ' ')
+    header_output.append('HORZ_UNITS {}'.format(header_data['horizontal_units']))
+    header_output.append('COMMENT {}'.format(header_data['comment']))
+    header_output.append('NUM_SERIES {}'.format(header_data['number_of_series']))
+    header_output.append('STORAGE_MODE {}'.format(header_data['storage_mode']))
+    header_output.append('FILE_TYPE {}'.format(header_data['file_type']))
     header_output.append('SLOPE ' + ','.join(
-        [_format_exponent_notation(slope, 6, 3) for slope in header_data['slope']]) + ' \n')
-    header_output.append('X_OFFSET {:1.1f}\n'.format(header_data['x_offset']))
+        [_format_exponent_notation(slope, 6, 3) for slope in header_data['slope']]) + ' ')
+    header_output.append('X_OFFSET {:1.1f}'.format(header_data['x_offset']))
     header_output.append('Y_OFFSET ' + ','.join(
-        [_format_exponent_notation(y_offset, 6, 3) for y_offset in header_data['y_offset']]) + ' \n')
-    header_output.append('NUM_SAMPS {}\n'.format(header_data['number_of_samples']))
-    header_output.append('DATA\n')
-    header_output.append('DEVICE {}\n'.format(header_data['device']))
-    header_output.append('SLOT1_AMP {id},{num_ch},{pld_ver},{fw_ver}\n'.format(
+        [_format_exponent_notation(y_offset, 6, 3) for y_offset in header_data['y_offset']]) + ' ')
+    header_output.append('NUM_SAMPS {}'.format(header_data['number_of_samples']))
+    header_output.append('DATA')
+    header_output.append('DEVICE {}'.format(header_data['device']))
+    header_output.append('SLOT1_AMP {id},{num_ch},{pld_ver},{fw_ver}'.format(
         id=header_data['slot1_amp']['id_name'],
         num_ch=header_data['slot1_amp']['num_of_channels'],
         pld_ver=header_data['slot1_amp']['pld_version'].ljust(8,' '),
         fw_ver=header_data['slot1_amp']['firmware_version'].ljust(8,' ')))
-    header_output.append('SLOT2_AMP {id},{num_ch},{pld_ver},{fw_ver}\n'.format(
+    header_output.append('SLOT2_AMP {id},{num_ch},{pld_ver},{fw_ver}'.format(
         id=header_data['slot2_amp']['id_name'],
         num_ch=header_data['slot2_amp']['num_of_channels'],
         pld_ver=header_data['slot2_amp']['pld_version'],
@@ -295,34 +305,35 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
     for index in range(header_data['number_of_series']):
         channel_key = 'CH{channel_num}_{channel_num}'.format(
                 channel_num = index + 1)
-        header_output.append('{channel_key} {amp_type},{range_setting},{filter_setting}\n'.format(
+        header_output.append('{channel_key} {amp_type},{range_setting},{filter_setting}'.format(
             channel_key=channel_key,
             amp_type=header_data['channel_info'][index]['amp_type'],
             range_setting=header_data['channel_info'][index]['range_setting'],
             filter_setting=header_data['channel_info'][index]['filter_setting']))
-    header_output.append('ID_NO {id_num}\n'.format(id_num=header_data['id_num']))
-    header_output.append('TIME {start},{end}\n'.format(
+    header_output.append('ID_NO {id_num}'.format(id_num=header_data['id_num']))
+    header_output.append('TIME {start},{end}'.format(
         start=header_data['start_time'],
         end=header_data['stop_time']))
-    header_output.append('REC_MODE {rec_mode} \n'.format(
+    header_output.append('REC_MODE {rec_mode} '.format(
         rec_mode=header_data['recording_destination']))
-    header_output.append('START_TRIGGER {trigger}  \n'.format(
+    header_output.append('START_TRIGGER {trigger}  '.format(
         trigger=header_data['start_trigger']))
-    header_output.append('STOP_CONDITION {condition}  \n'.format(
+    header_output.append('STOP_CONDITION {condition}  '.format(
         condition=header_data['stop_condition']))
-    header_output.append('ID_END\n')
+    header_output.append('ID_END')
     if header_data['voice_memo_on']:
-        header_output.append('VOICE_MEMO {bits},{size}\n'.format(
+        header_output.append('VOICE_MEMO {bits},{size}'.format(
             bits=header_data['voice_memo_bits_per_sample'],
             size=header_data['voice_memo_size_bytes']))
-    header_output.append('{model}_VERSION {ver}\n'.format(
+    header_output.append('{model}_VERSION {ver}'.format(
         model=header_data['recorder_model'],
         ver=header_data['recorder_version']))
-    header_output.append('MEMO_LENGTH {memo_len}\n'.format(
+    header_output.append('MEMO_LENGTH {memo_len}'.format(
         memo_len=header_data['memo_length']))
-    header_output.append('MEMO {memo}\n'.format(memo=header_data['memo']))
-    header_output.append('\n')
+    header_output.append('MEMO {memo}'.format(memo=header_data['memo']))
+    header_output.append('')
 
+    header_output = _append_windows_newlines(header_output)
 
     # Write the .hdr file
     with open(output_hdr_filename, 'w') as f_header:

@@ -1,8 +1,8 @@
 # taffmat
 
-Python module for reading and writing Teac TAFFmat files.
+A Python module for reading and writing Teac TAFFmat files.
 
-## About TAFFmat
+## About the TAFFmat file format
 
 TAFFmat is Teac's proprietary file format used to store data from their
 LX series and other data recorders, such as the LX-10.
