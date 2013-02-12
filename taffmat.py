@@ -330,19 +330,40 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
 
     return
 
+def _write_taffmat_dat_slice(data_array, starting_data_point, ending_data_point,
+        number_of_series, slope, y_offset, output_dat_filename):
+    '''
+    Write a slice of the data_array to the .dat TAFFmat file 
+
+    The data will be written as either int16 or int32 based on
+    data_array.astype.
+    '''
+
+    # Convert data_array into int16 values by removing the offset
+    # and slope, such that +/-100% = +/-25,000 int16
+    data_array = _remove_slope_and_offset(data_array, number_of_series,
+            slope, y_offset)
+    # Write the binary data file.
+    with open(output_dat_filename, 'wb') as datfile:
+        data_array[:,starting_data_point:ending_data_point].T.reshape(
+                (-1,number_of_series)).tofile(datfile)
+
+    return
+
 def _write_taffmat_dat(data_array, number_of_series, slope, y_offset,
         output_dat_filename):
     '''
     Write the .dat TAFFmat file
     '''
 
-    # Convert data_array into int16 values by removing the offset
-    # and slope, such that +/-100% = +/-25,000 int16
-    # Then write the binary data file.
-    data_array = _remove_slope_and_offset(data_array, number_of_series,
-            slope, y_offset)
-    with open(output_dat_filename, 'wb') as datfile:
-        data_array.T.reshape((-1,number_of_series)).tofile(datfile)
+    # Determine the starting and ending points of the entire data_array
+    starting_data_point = 0
+    ending_data_point = data_array.shape[1]
+
+    # Write the .dat slice using the first and last data points, so 
+    # that the entire data_array is written to the .dat file.
+    _write_taffmat_dat_slice(data_array, starting_data_point, ending_data_point,
+            number_of_series, slope, y_offset, output_dat_filename)
 
     return
 
