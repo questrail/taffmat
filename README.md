@@ -19,4 +19,19 @@ According to the Teac "LX Series Recording Unit Instruction Manual":
 
 TAFFmat is a trademark of Teac Corporation.
 
+## Installation
 
+You can install taffmat either via the Python Package Index (PyPI) or
+from source:
+
+To install using pip:
+
+    $ pip install taffmat
+
+**Source:** https://github.com/questrail/taffmat
+
+## Requirements
+
+taffmat requires the following Python packages:
+
+* `numpy`
