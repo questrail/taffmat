@@ -160,7 +160,13 @@ def read_taffmat(input_file):
     header_data['y_offset'] = [float(y_offset)
             for y_offset in raw_header_data['y_offset'].split(',')]
     header_data['number_of_samples'] = int(raw_header_data['num_samps'])
+    # The .hdr file will have a row containing just "DATA" to indicate
+    # that the entries here on are proprietary to the data recorder.
+    # Prior to this point, the header file was in the DADiSP format.
     header_data['device'] = raw_header_data['device']
+    # FIXME: The following information is not recorded when recording to
+    # a PC. Should update the reading and writing code to handle
+    # that scenario.
     slot1_amp = raw_header_data['slot1_amp'].split(',')
     header_data['slot1_amp'] = {}
     header_data['slot1_amp']['id_name'] = slot1_amp[0]
@@ -202,6 +208,8 @@ def read_taffmat(input_file):
         # Voice memo was not recored
         header_data['voice_memo_on'] = False
     # Determine the version of data recorder used to capture the data
+    # FIXME: Instead of saving the FW and PAL versions for the recorder
+    # as a string, I should split them out into their own dictionary.
     if 'lx10_version' in raw_header_data:
         header_data['recorder_model'] = 'LX10'
         header_data['recorder_version'] = raw_header_data['lx10_version']
@@ -217,7 +225,10 @@ def read_taffmat(input_file):
     else:
         header_data['recorder_model'] = 'Unrecognized data recorder model'
         header_data['recorder_version'] = 'Unknown data recorder version'
-
+    # FIXME: Instead of storing the memo_length as a string, I should strip
+    # the first number which is the length of the memo. After the memo
+    # length, this field will always have seven comma separated zeros
+    # (e.g., ",0,0,0,0,0,0,0")
     header_data['memo_length'] = raw_header_data['memo_length']
     header_data['memo'] = raw_header_data['memo']
 
