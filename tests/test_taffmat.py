@@ -223,6 +223,9 @@ class TestWritingTAFFmatFile(unittest.TestCase):
                 output_hdr_contents_no_blank_lines,
                 'Source and output header files are not the same (excluding blank lines).')
 
+    # TODO: Need to increase test coverage for reading and writing the various
+    # hdr and dat files, especially the slices.
+
 
 if __name__ == '__main__':
     unittest.main()

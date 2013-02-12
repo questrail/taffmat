@@ -330,13 +330,18 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
 
     return
 
-def _write_taffmat_dat_slice(data_array, starting_data_point, ending_data_point,
+def _write_taffmat_dat_slice(data_array, starting_data_index, ending_data_index,
         number_of_series, slope, y_offset, output_dat_filename):
     '''
     Write a slice of the data_array to the .dat TAFFmat file 
 
     The data will be written as either int16 or int32 based on
     data_array.astype.
+    
+    Note: numpy, like python lists, has the following slicing syntax:
+    s[i:j] which returns the elements with index k, where i <= k < j
+    This means that we have to add one to the ending_data_index in
+    order to make sure that it is included.
     '''
 
     # Convert data_array into int16 values by removing the offset
@@ -345,7 +350,7 @@ def _write_taffmat_dat_slice(data_array, starting_data_point, ending_data_point,
             slope, y_offset)
     # Write the binary data file.
     with open(output_dat_filename, 'wb') as datfile:
-        data_array[:,starting_data_point:ending_data_point].T.reshape(
+        data_array[:,starting_data_index:ending_data_index+1].T.reshape(
                 (-1,number_of_series)).tofile(datfile)
 
     return
@@ -356,13 +361,13 @@ def _write_taffmat_dat(data_array, number_of_series, slope, y_offset,
     Write the .dat TAFFmat file
     '''
 
-    # Determine the starting and ending points of the entire data_array
-    starting_data_point = 0
-    ending_data_point = data_array.shape[1]
+    # Grab the first and last indices of data_array
+    starting_data_index = 0
+    ending_data_index = data_array.shape[1] - 1
 
     # Write the .dat slice using the first and last data points, so 
     # that the entire data_array is written to the .dat file.
-    _write_taffmat_dat_slice(data_array, starting_data_point, ending_data_point,
+    _write_taffmat_dat_slice(data_array, starting_data_index, ending_data_index,
             number_of_series, slope, y_offset, output_dat_filename)
 
     return
@@ -411,7 +416,6 @@ def read_taffmat(input_file):
     return (data_array, time_vector, header_data)
 
 
-
 def write_taffmat(data_array, header_data, output_base_filename):
     '''
     Write the TAFFmat .dat and .hdr files
@@ -425,6 +429,37 @@ def write_taffmat(data_array, header_data, output_base_filename):
     _write_taffmat_dat(data_array, header_data['number_of_series'],
             header_data['slope'], header_data['y_offset'],
             output_dat_filename)
+
+    return
+
+def write_taffmat_slice(data_array, header_data, output_base_filename,
+        starting_data_index, ending_data_index):
+    '''
+    Write the TAFFmat .dat and .hdr given the starting and ending
+    data points to include in the .dat file.
+
+    The only change to the .hdr file from the given header_data
+    dictionary is that the number of samples will be recalculated
+    based on the starting and ending data points to be written.
+    '''
+
+    # Determine the output file names
+    output_hdr_filename = '{base}.hdr'.format(base=output_base_filename)
+    output_dat_filename = '{base}.dat'.format(base=output_base_filename)
+
+    # Calculate number of samples
+    new_number_of_samples = ending_data_index + 1 - starting_data_index
+
+    # Update header_data with the new number of samples
+    header_data['number_of_samples'] = new_number_of_samples
+
+    # Write the .hdr TAFFmat file with the new number of samples
+    _write_taffmat_hdr(header_data, output_hdr_filename)
+
+    # Write the .dat TAFFmat file with a slice of data_array
+    _write_taffmat_dat_slice(data_array, starting_data_index, ending_data_index,
+            header_data['number_of_series'], header_data['slope'],
+            header_data['y_offset'], output_dat_filename)
 
     return
 
