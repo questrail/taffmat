@@ -1,14 +1,13 @@
 from distutils.core import setup
 setup(
     name='taffmat',
-    version='0.1.1',
+    version='0.1.2',
     author='Matthew Rankin',
     author_email='matthew@questrail.com',
     py_modules=['taffmat'],
     url='http://github.com/questrail/taffmat',
     license='LICENSE.txt',
     description='Read and write Teac TAFFmat files.',
-    long_description=open('README.rst', 'rt').read(),
     requires=['numpy (>=1.6.0)'],
     classifiers=[
         'Programming Language :: Python',
