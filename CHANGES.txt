@@ -4,6 +4,7 @@ Changelog
 develop (unreleased)
 --------------------
 * Write slices of data_array
+* Add test for writing slice
 
 0.1.2 (February 11, 2013)
 -------------------------
