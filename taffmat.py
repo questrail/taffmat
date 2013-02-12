@@ -106,19 +106,15 @@ def _format_exponent_notation(input_number, precision, num_exponent_digits):
             exponent=int(exponent),
             exp_num=num_exponent_digits+1)
 
-def read_taffmat(input_file):
 
-    input_file_basename, input_file_extension = os.path.splitext(
-            input_file)
+def _read_taffmat_hdr(input_hdr_file):
+    '''
+    Read the TAFFmat .hdr file into a "smart" dictionary containing
+    all the header data.
+    '''
 
-    inputdatfile = '{base}.dat'.format(base=input_file_basename)
-    inputhdrfile = '{base}.hdr'.format(base=input_file_basename)
-
-    if not os.path.isfile(inputdatfile) or not os.path.isfile(inputhdrfile):
-        return False
-
-    # Process the header file first
-    with open(inputhdrfile, 'r') as f_header:
+    # Read in all lines from the .hdr file
+    with open(input_hdr_file, 'r') as f_header:
         header_data_all_lines = f_header.readlines()
 
     # Read the header file into an ordered dictionary using the first
@@ -232,29 +228,68 @@ def read_taffmat(input_file):
     header_data['memo_length'] = raw_header_data['memo_length']
     header_data['memo'] = raw_header_data['memo']
 
+    return header_data
+
+def _read_taffmat_dat(input_dat_file, file_type, number_of_series,
+        slope, y_offset):
+
     # Determine if the .dat file saved the data using 2-bytes (int16)
     # or 4-bytes (int32).
-    if header_data['file_type'] == 'INTEGER':
+    if file_type == 'INTEGER':
         data_size = np.int16
-    elif header_data['file_type'] == 'LONG':
+    elif file_type == 'LONG':
         data_size = np.int32
     else:
         data_size = np.int16
     # Read the entire file and reshape the data so that each channel/series
     # is in its own row
-    with open(inputdatfile, 'rb') as datfile:
-        data_array = np.fromfile(datfile, np.int16).reshape((-1,header_data['number_of_series'])).T
+    with open(input_dat_file, 'rb') as datfile:
+        data_array = np.fromfile(datfile, np.int16).reshape((-1,number_of_series)).T
 
     data_array = _apply_slope_and_offset(data_array,
-            header_data['number_of_series'],
-            header_data['slope'],
+            number_of_series,
+            slope,
+            y_offset)
+
+    return (data_array)
+
+def read_taffmat(input_file):
+    # If the input_file contains the extension .dat or .hdr,
+    # strip that off to create the input_file_basename
+    # and then create both the .dat and .hdr filenames
+    input_file_basename, input_file_extension = os.path.splitext(
+            input_file)
+
+    if input_file_extension.lower() in ['.dat', '.hdr']:
+        # The input_file contained the extension of .dat or .hdr
+        input_dat_file = '{base}.dat'.format(base=input_file_basename)
+        input_hdr_file = '{base}.hdr'.format(base=input_file_basename)
+    else:
+        # The input_file didn't contain an extension, so append .dat and .hdr
+        # TODO: Add unit tests to make sure we're properly handling
+        # input_file with .dat, .hdr, or no extension
+        input_dat_file = '{base}.dat'.format(base=input_file)
+        input_hdr_file = '{base}.hdr'.format(base=input_file)
+
+    if not os.path.isfile(input_dat_file) or not os.path.isfile(input_hdr_file):
+        # The .dat or .hdr file doesn't exist, so exit
+        # FIXME: What error code, if any should I be returning?
+        return False
+
+    # Read the hdr file
+    header_data = _read_taffmat_hdr(input_hdr_file)
+
+    # Read the dat file
+    data_array = _read_taffmat_dat(input_dat_file, header_data['file_type'],
+            header_data['number_of_series'], header_data['slope'],
             header_data['y_offset'])
 
-    # Create the array for the time/x dimension
+    # Create the time vector
     time_vector = np.linspace(0, 
             header_data['number_of_samples'] / header_data['sampling_frequency_hz'],
             header_data['number_of_samples'])
 
+    # Return a tuple
     return (data_array, time_vector, header_data)
 
 
