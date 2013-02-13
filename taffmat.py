@@ -52,6 +52,7 @@ from __future__ import absolute_import
 
 # Standard module imports
 import os
+import sys
 from datetime import datetime
 from collections import OrderedDict
 
@@ -385,6 +386,7 @@ def read_taffmat(input_file):
     if not os.path.isfile(input_dat_file) or not os.path.isfile(input_hdr_file):
         # The .dat or .hdr file doesn't exist, so exit
         # FIXME: What error code, if any should I be returning?
+        #sys.exit('Input files do not exist')
         return False
 
     # Read the hdr file
@@ -440,6 +442,7 @@ def write_taffmat_slice(data_array, header_data, output_base_filename,
 
     # Update header_data with the new number of samples
     sliced_header_data['number_of_samples'] = new_number_of_samples
+    sliced_header_data['voice_memo_on'] = False
 
     # Write the sliced TAFFmat data
     write_taffmat(sliced_data_array, sliced_header_data, output_base_filename)
