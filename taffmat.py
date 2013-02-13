@@ -412,8 +412,8 @@ def write_taffmat(data_array, header_data, output_base_filename):
     '''
 
     # Determine the output file names
-    output_hdr_filename = '{base}.hdr'.format(base=output_base_filename)
-    output_dat_filename = '{base}.dat'.format(base=output_base_filename)
+    output_hdr_filename = '{base}.HDR'.format(base=output_base_filename)
+    output_dat_filename = '{base}.DAT'.format(base=output_base_filename)
 
     _write_taffmat_hdr(header_data, output_hdr_filename)
     _write_taffmat_dat(data_array, header_data['number_of_series'],
