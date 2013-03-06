@@ -38,7 +38,7 @@ to just have one blank line at the end with no spaces on it.
 * The binary Teac data is stored as int16 (2-bytes) and only
 +25,000 to -25,000 and then it's multiplied by the slope,
 which we know can be 0.5, 1, 2, 5, 10, 20 or 50 V. Note that,
-"a range of +/-131% of the selected range can be obtained for 
+"a range of +/-131% of the selected range can be obtained for
 A/D conversion value; however, the input margin
 level is approximately +/-120%." [Source p. 4-5 of Teac manual]
 
@@ -59,6 +59,7 @@ from collections import OrderedDict
 # Data analysis related imports
 import numpy as np
 
+
 def _append_windows_newlines(input_list_of_strings):
     '''
     Given a list of strings append the Windows new line character
@@ -71,6 +72,7 @@ def _append_windows_newlines(input_list_of_strings):
 
     return output_list_of_strings
 
+
 def _apply_slope_and_offset(data_array, number_of_series, slope, y_offset):
     """
     Convert from int16 to float64 and apply the slope and offset
@@ -78,10 +80,11 @@ def _apply_slope_and_offset(data_array, number_of_series, slope, y_offset):
     """
     data_array = data_array.astype(np.float64)
     for series in range(0, number_of_series):
-        data_array[series] = (data_array[series] * slope[series] 
-                + y_offset[series])
+        data_array[series] = (data_array[series] * slope[series]
+                              + y_offset[series])
 
     return data_array
+
 
 def _remove_slope_and_offset(data_array, number_of_series, slope, y_offset):
     """
@@ -91,12 +94,13 @@ def _remove_slope_and_offset(data_array, number_of_series, slope, y_offset):
     # FIXME: There's no reason to pass the number_of_series into this function
     # since the data_array's first dimension tells how many series there are.
     for series in range(0, number_of_series):
-        data_array[series] = np.around((data_array[series] - y_offset[series]) /
-                slope[series])
+        data_array[series] = np.around(
+            (data_array[series] - y_offset[series]) / slope[series])
 
     data_array = data_array.astype('int16')
 
     return data_array
+
 
 def _format_exponent_notation(input_number, precision, num_exponent_digits):
     """
@@ -110,14 +114,14 @@ def _format_exponent_notation(input_number, precision, num_exponent_digits):
     [answer]: http://stackoverflow.com/a/9911741/95592
     """
     python_exponent_notation = '{number:.{precision}e}'.format(
-            number=input_number,
-            precision=precision)
+        number=input_number,
+        precision=precision)
     mantissa, exponent = python_exponent_notation.split('e')
     # Add 1 to the desired number of exponenent digits to account for the sign
     return '{mantissa}e{exponent:+0{exp_num}d}'.format(
-            mantissa=mantissa,
-            exponent=int(exponent),
-            exp_num=num_exponent_digits+1)
+        mantissa=mantissa,
+        exponent=int(exponent),
+        exp_num=num_exponent_digits+1)
 
 
 def _read_taffmat_hdr(input_hdr_file):
@@ -149,10 +153,10 @@ def _read_taffmat_hdr(input_hdr_file):
     header_data['dataset'] = raw_header_data['dataset']
     header_data['version'] = int(raw_header_data['version'])
     header_data['series_labels'] = raw_header_data['series'].split(',')
-    start_recording_datetime_as_string = (raw_header_data['date'] + 
-            ' ' + raw_header_data['time'])
+    start_recording_datetime_as_string = (
+        raw_header_data['date'] + ' ' + raw_header_data['time'])
     header_data['recording_start_datetime'] = datetime.strptime(
-            start_recording_datetime_as_string, '%m-%d-%Y %H:%M:%S.%f')
+        start_recording_datetime_as_string, '%m-%d-%Y %H:%M:%S.%f')
     header_data['sampling_frequency_hz'] = int(raw_header_data['rate'])
     header_data['vertical_units'] = raw_header_data['vert_units'].split(',')
     header_data['horizontal_units'] = raw_header_data['horz_units']
@@ -163,11 +167,11 @@ def _read_taffmat_hdr(input_hdr_file):
     # INTEGER = 16 bit A/D = 2-byte integers
     # LONG = 24 bit A/D = 4-byte integers
     header_data['file_type'] = raw_header_data['file_type']
-    header_data['slope'] = [float(slope)
-            for slope in raw_header_data['slope'].split(',')]
+    header_data['slope'] = [
+        float(slope) for slope in raw_header_data['slope'].split(',')]
     header_data['x_offset'] = float(raw_header_data['x_offset'])
-    header_data['y_offset'] = [float(y_offset)
-            for y_offset in raw_header_data['y_offset'].split(',')]
+    header_data['y_offset'] = [
+        float(y_offset) for y_offset in raw_header_data['y_offset'].split(',')]
     header_data['number_of_samples'] = int(raw_header_data['num_samps'])
     # The .hdr file will have a row containing just "DATA" to indicate
     # that the entries here on are proprietary to the data recorder.
@@ -191,7 +195,7 @@ def _read_taffmat_hdr(input_hdr_file):
     header_data['channel_info'] = []
     for index in range(header_data['number_of_series']):
         raw_key = 'ch{channel_num}_{channel_num}'.format(
-                channel_num = index + 1)
+            channel_num=index + 1)
         raw_channel_info = raw_header_data[raw_key].split(',')
         header_data['channel_info'].append({
             'channel_num': index + 1,
@@ -243,8 +247,9 @@ def _read_taffmat_hdr(input_hdr_file):
 
     return header_data
 
+
 def _read_taffmat_dat(input_dat_file, file_type, number_of_series,
-        slope, y_offset):
+                      slope, y_offset):
 
     # Determine if the .dat file saved the data using 2-bytes (int16)
     # or 4-bytes (int32).
@@ -257,49 +262,60 @@ def _read_taffmat_dat(input_dat_file, file_type, number_of_series,
     # Read the entire file and reshape the data so that each channel/series
     # is in its own row
     with open(input_dat_file, 'rb') as datfile:
-        data_array = np.fromfile(datfile, np.int16).reshape((-1,number_of_series)).T
+        data_array = np.fromfile(datfile, np.int16).reshape(
+            (-1, number_of_series)).T
 
     data_array = _apply_slope_and_offset(data_array,
-            number_of_series,
-            slope,
-            y_offset)
+                                         number_of_series, slope,
+                                         y_offset)
 
     return (data_array)
+
 
 def _write_taffmat_hdr(header_data, output_hdr_filename):
     '''
     Write the TAFFmat .hdr file
     '''
+    print('output_hdr_filename =', output_hdr_filename)
 
     # Convert "smart" dictionary items into strings that are
     # ready to be saved to the .hdr text file.
     header_output = []
     header_output.append('DATASET {}'.format(header_data['dataset']))
     header_output.append('VERSION {}'.format(header_data['version']))
-    header_output.append('SERIES ' + ','.join(header_data['series_labels']) + ' ')
-    header_output.append('DATE ' + header_data['recording_start_datetime'].strftime('%m-%d-%Y'))
-    header_output.append('TIME ' + 
-            header_data['recording_start_datetime'].strftime('%H:%M:%S.%f')[0:11])
+    header_output.append('SERIES ' + ','.join(
+        header_data['series_labels']) + ' ')
+    header_output.append(
+        'DATE ' + header_data['recording_start_datetime'].strftime('%m-%d-%Y'))
+    header_output.append(
+        'TIME ' +
+        header_data['recording_start_datetime'].strftime('%H:%M:%S.%f')[0:11])
     header_output.append('RATE ' + str(header_data['sampling_frequency_hz']))
-    header_output.append('VERT_UNITS ' + ','.join(header_data['vertical_units']) + ' ')
-    header_output.append('HORZ_UNITS {}'.format(header_data['horizontal_units']))
+    header_output.append(
+        'VERT_UNITS ' + ','.join(header_data['vertical_units']) + ' ')
+    header_output.append(
+        'HORZ_UNITS {}'.format(header_data['horizontal_units']))
     header_output.append('COMMENT {}'.format(header_data['comment']))
-    header_output.append('NUM_SERIES {}'.format(header_data['number_of_series']))
+    header_output.append(
+        'NUM_SERIES {}'.format(header_data['number_of_series']))
     header_output.append('STORAGE_MODE {}'.format(header_data['storage_mode']))
     header_output.append('FILE_TYPE {}'.format(header_data['file_type']))
-    header_output.append('SLOPE ' + ','.join(
-        [_format_exponent_notation(slope, 6, 3) for slope in header_data['slope']]) + ' ')
+    header_output.append(
+        'SLOPE ' + ','.join([_format_exponent_notation(slope, 6, 3)
+                            for slope in header_data['slope']]) + ' ')
     header_output.append('X_OFFSET {:1.1f}'.format(header_data['x_offset']))
-    header_output.append('Y_OFFSET ' + ','.join(
-        [_format_exponent_notation(y_offset, 6, 3) for y_offset in header_data['y_offset']]) + ' ')
-    header_output.append('NUM_SAMPS {}'.format(header_data['number_of_samples']))
+    header_output.append(
+        'Y_OFFSET ' + ','.join([_format_exponent_notation(y_offset, 6, 3)
+                               for y_offset in header_data['y_offset']]) + ' ')
+    header_output.append('NUM_SAMPS {}'.format(
+                         header_data['number_of_samples']))
     header_output.append('DATA')
     header_output.append('DEVICE {}'.format(header_data['device']))
     header_output.append('SLOT1_AMP {id},{num_ch},{pld_ver},{fw_ver}'.format(
         id=header_data['slot1_amp']['id_name'],
         num_ch=header_data['slot1_amp']['num_of_channels'],
-        pld_ver=header_data['slot1_amp']['pld_version'].ljust(8,' '),
-        fw_ver=header_data['slot1_amp']['firmware_version'].ljust(8,' ')))
+        pld_ver=header_data['slot1_amp']['pld_version'].ljust(8, ' '),
+        fw_ver=header_data['slot1_amp']['firmware_version'].ljust(8, ' ')))
     header_output.append('SLOT2_AMP {id},{num_ch},{pld_ver},{fw_ver}'.format(
         id=header_data['slot2_amp']['id_name'],
         num_ch=header_data['slot2_amp']['num_of_channels'],
@@ -307,12 +323,15 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
         fw_ver=header_data['slot2_amp']['firmware_version']))
     for index in range(header_data['number_of_series']):
         channel_key = 'CH{channel_num}_{channel_num}'.format(
-                channel_num = index + 1)
-        header_output.append('{channel_key} {amp_type},{range_setting},{filter_setting}'.format(
-            channel_key=channel_key,
-            amp_type=header_data['channel_info'][index]['amp_type'],
-            range_setting=header_data['channel_info'][index]['range_setting'],
-            filter_setting=header_data['channel_info'][index]['filter_setting']))
+            channel_num=index + 1)
+        header_output.append(
+            '{channel_key} {amp_type},{range_setting},{filter_setting}'.format(
+                channel_key=channel_key,
+                amp_type=header_data['channel_info'][index]['amp_type'],
+                range_setting=
+                header_data['channel_info'][index]['range_setting'],
+                filter_setting=
+                header_data['channel_info'][index]['filter_setting']))
     header_output.append('ID_NO {id_num}'.format(id_num=header_data['id_num']))
     header_output.append('TIME {start},{end}'.format(
         start=header_data['start_time'],
@@ -344,22 +363,24 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
 
     return
 
+
 def _write_taffmat_dat(data_array, number_of_series, slope, y_offset,
-        output_dat_filename):
+                       output_dat_filename):
     '''
     Write the .dat TAFFmat file
     '''
 
     # Convert data_array into int16 values by removing the offset
     # and slope, such that +/-100% = +/-25,000 int16
-    data_array = _remove_slope_and_offset(data_array, number_of_series,
-            slope, y_offset)
+    data_array = _remove_slope_and_offset(
+        data_array, number_of_series, slope, y_offset)
 
     # Write the binary data file.
     with open(output_dat_filename, 'wb') as datfile:
-        data_array.T.reshape((-1,number_of_series)).tofile(datfile)
+        data_array.T.reshape((-1, number_of_series)).tofile(datfile)
 
     return
+
 
 def read_taffmat(input_file):
     '''
@@ -370,7 +391,7 @@ def read_taffmat(input_file):
     # strip that off to create the input_file_basename
     # and then create both the .dat and .hdr filenames
     input_file_basename, input_file_extension = os.path.splitext(
-            input_file)
+        input_file)
 
     if input_file_extension.lower() in ['.dat', '.hdr']:
         # The input_file contained the extension of .dat or .hdr
@@ -383,7 +404,8 @@ def read_taffmat(input_file):
         input_dat_file = '{base}.dat'.format(base=input_file)
         input_hdr_file = '{base}.hdr'.format(base=input_file)
 
-    if not os.path.isfile(input_dat_file) or not os.path.isfile(input_hdr_file):
+    if (not os.path.isfile(input_dat_file) or
+            not os.path.isfile(input_hdr_file)):
         # The .dat or .hdr file doesn't exist, so exit
         # FIXME: What error code, if any should I be returning?
         #sys.exit('Input files do not exist')
@@ -393,14 +415,18 @@ def read_taffmat(input_file):
     header_data = _read_taffmat_hdr(input_hdr_file)
 
     # Read the dat file
-    data_array = _read_taffmat_dat(input_dat_file, header_data['file_type'],
-            header_data['number_of_series'], header_data['slope'],
-            header_data['y_offset'])
+    data_array = _read_taffmat_dat(
+        input_dat_file, header_data['file_type'],
+        header_data['number_of_series'],
+        header_data['slope'],
+        header_data['y_offset'])
 
     # Create the time vector
-    time_vector = np.linspace(0, 
-            header_data['number_of_samples'] / header_data['sampling_frequency_hz'],
-            header_data['number_of_samples'])
+    time_vector = np.linspace(
+        0,
+        (header_data['number_of_samples'] /
+            header_data['sampling_frequency_hz']),
+        header_data['number_of_samples'])
 
     # Return a tuple
     return (data_array, time_vector, header_data)
@@ -417,13 +443,14 @@ def write_taffmat(data_array, header_data, output_base_filename):
 
     _write_taffmat_hdr(header_data, output_hdr_filename)
     _write_taffmat_dat(data_array, header_data['number_of_series'],
-            header_data['slope'], header_data['y_offset'],
-            output_dat_filename)
+                       header_data['slope'], header_data['y_offset'],
+                       output_dat_filename)
 
     return
 
+
 def write_taffmat_slice(data_array, header_data, output_base_filename,
-        starting_data_index, ending_data_index):
+                        starting_data_index, ending_data_index):
     '''
     Write the TAFFmat .dat and .hdr given the starting and ending
     data points to include in the .dat file.
@@ -434,7 +461,7 @@ def write_taffmat_slice(data_array, header_data, output_base_filename,
     '''
 
     # Create copies of the originals
-    sliced_data_array = data_array[:,starting_data_index:ending_data_index+1]
+    sliced_data_array = data_array[:, starting_data_index:ending_data_index+1]
     sliced_header_data = header_data
 
     # Calculate number of samples
@@ -442,7 +469,15 @@ def write_taffmat_slice(data_array, header_data, output_base_filename,
 
     # Update header_data with the new number of samples
     sliced_header_data['number_of_samples'] = new_number_of_samples
+
+    # Since we're saving a slice, the voice memo will not be the
+    # same length, so just disable the voice memo (i.e., remove
+    # VOICE_MEMO line from .HDR file)
     sliced_header_data['voice_memo_on'] = False
+
+    # Rename the DATASET to the new filename
+    sliced_header_data['dataset'] = (
+        os.path.basename(output_base_filename).upper())
 
     # Write the sliced TAFFmat data
     write_taffmat(sliced_data_array, sliced_header_data, output_base_filename)
@@ -452,15 +487,16 @@ def write_taffmat_slice(data_array, header_data, output_base_filename,
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('inputfile', 
-            action="store",
-            help="Input filename excluding extension")
-    parser.add_argument('-o', '--outputfile', 
-            action="store",
-            help="Output filename including extension")
+    parser.add_argument('inputfile',
+                        action="store",
+                        help="Input filename excluding extension")
+    parser.add_argument('-o', '--outputfile',
+                        action="store",
+                        help="Output filename including extension")
     args = parser.parse_args()
 
-    input_file_basename, input_file_extension = os.path.splitext(os.path.realpath(args.inputfile))
+    input_file_basename, input_file_extension = (
+        os.path.splitext(os.path.realpath(args.inputfile)))
     if args.outputfile is None:
         outputfile = '{base}.csv'.format(base=input_file_basename)
     else:
@@ -470,10 +506,12 @@ if __name__ == "__main__":
     data_array, time_vector, header_data = read_taffmat(input_file_basename)
 
     # Print some information about the data we just grabbed
-    print("Sampled {num_samples:,} samples over {sample_time:.3f} sec at {sampling_freq:,} Hz".format(
-        num_samples = header_data['number_of_samples'],
-        sample_time = header_data['number_of_samples'] / header_data['sampling_frequency_hz'],
-        sampling_freq = header_data['sampling_frequency_hz']))
+    print(
+        "Sampled {num_samples:,} samples over {sample_time:.3f} "
+        "sec at {sampling_freq:,} Hz".format(
+            num_samples=header_data['number_of_samples'],
+            sample_time=(header_data['number_of_samples'] /
+                         header_data['sampling_frequency_hz']),
+            sampling_freq=header_data['sampling_frequency_hz']))
     print("Resulting in {sec_per_sample:.4e} sec/sample".format(
-        sec_per_sample = 1 / header_data['sampling_frequency_hz']))
-
+        sec_per_sample=(1 / header_data['sampling_frequency_hz'])))
