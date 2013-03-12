@@ -29,6 +29,9 @@ class TestConvertingDataArray(unittest.TestCase):
         self.given_data_array_float = np.array(
                 [[-2.0, -1.0, 0.0, 0.00008, 1.0, 2.0],
                 [-4.9, -2.4, 0.1, 0.1002, 2.6, 5.1]], dtype=np.float64)
+        self.given_data_array_new_slope = np.array(
+                [[-1.0, -0.5, 0.0, 0.00004, 0.5, 1.0],
+                [-4.9, -2.4, 0.1, 0.1002, 2.6, 5.1]], dtype=np.float64)
 
     def test_converting_data_array_from_int_to_float(self):
         data_array_float = taffmat._apply_slope_and_offset(
@@ -44,6 +47,19 @@ class TestConvertingDataArray(unittest.TestCase):
                 self.slope, self.y_offset)
         np.testing.assert_array_equal(data_array_int, self.given_data_array_int,
                 'Failed removing slope and offset')
+
+    def test_changing_slope(self):
+        data_array_new_slope = taffmat.change_slope(
+            self.given_data_array_float,
+            0,
+            0.5)
+        np.testing.assert_array_equal(
+            data_array_new_slope,
+            self.given_data_array_new_slope,
+            'Failed applying 1/2 gain to slope of series 0')
+        np.testing.assert_array_equal(
+            self.given_data_array_float,
+            self.given_data_array_new_slope)
 
 class TestInputFilenames(unittest.TestCase):
 

@@ -1,8 +1,11 @@
+Powerline==beta
 distribute==0.6.31
 git-remote-helpers==0.1.0
 nose==1.2.1
 numpy==1.6.2
+pep8==1.4.5
 stevedore==0.7.2
+-e git+git@github.com:questrail/taffmat.git@0948cd5f31596d5543881a6643246f0bb8767be5#egg=taffmat-dev
 virtualenv==1.8.4
 virtualenv-clone==0.2.4
 virtualenvwrapper==3.6

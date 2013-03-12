@@ -61,9 +61,19 @@ import numpy as np
 
 
 def _append_windows_newlines(input_list_of_strings):
-    '''
-    Given a list of strings append the Windows new line character
-    to each string and return the new list
+    '''Append Windows style newlines to list of strings.
+
+    Takes a list of strings and replaces UNIX style line endings with
+    Windows style line endings \\r\\n.
+
+    Args:
+        input_list_of_strings: A list of strings.
+
+    Returns:
+        A list of strings with Windows newline characters \\r\\n.
+
+    Raies:
+        N/A
     '''
     windows_newline_character = '\r\n'
     output_list_of_strings = []
@@ -248,8 +258,52 @@ def _read_taffmat_hdr(input_hdr_file):
     return header_data
 
 
+def change_slope(data_array, series, gain):
+    '''Apply gain to the desired series in a data_array
+
+    Args:
+        data_array:
+        series: integer listing the series to apply the gain (0-based)
+        gain: float by which all data for given series will be multiplied
+
+    Return:
+        data_array: Return by reference
+
+    Raises:
+        N/A
+    '''
+    data_array[series] = gain * data_array[series]
+    return data_array
+
+
 def _read_taffmat_dat(input_dat_file, file_type, number_of_series,
                       slope, y_offset):
+    '''Read the TAFFmat binary .dat file
+
+    Args:
+        input_dat_file: Filename of the .dat file
+        file_type: INTEGER or LONG as determined by reading the .hdr
+            file so we know if the data was recording in 2 or 4-bytes
+        number_of_series: Integer from .hdr file stating the number of
+            series recorded in the .dat file
+        slope: list of floats read from .hdr file (slope = range / 25,000).
+            One float per series. The max range of the ADC is +/-25,000
+             0.5V = 2e-5
+               1V = 4e-5
+               2V = 8e-5
+               5V = 2e-4
+              10V = 4e-4
+              20V = 8e-4
+              50V = 2e-3
+        y_offset: list of floats read from .hdr file. One float per
+            series.
+
+    Returns:
+        data_array: ndarray with shape series x num_samples
+
+    Raises:
+        N/A
+    '''
 
     # Determine if the .dat file saved the data using 2-bytes (int16)
     # or 4-bytes (int32).
@@ -383,8 +437,22 @@ def _write_taffmat_dat(data_array, number_of_series, slope, y_offset,
 
 
 def read_taffmat(input_file):
-    '''
-    Read the TAFFmat .hdr and .dat files
+    '''Read the TAFFmat .hdr and .dat files
+
+    Read the Teac TAFFmat text header file (.hdr) and the binary
+    data file (.dat).
+
+    Args:
+        input_file: Filename consisting of either just the base
+            filename or can include the .dat or .hdr suffix
+
+    Returns:
+        A tuple containing the data_array (ndarray with shape
+        of series x num_samples),
+        time_vector (ndarray), and header_data (dictionary)
+
+    Raises:
+        N/A
     '''
 
     # If the input_file contains the extension .dat or .hdr,
