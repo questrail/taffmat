@@ -422,6 +422,7 @@ def _write_taffmat_dat(data_array, number_of_series, slope, y_offset,
                        output_dat_filename):
     '''
     Write the .dat TAFFmat file
+    WARNING: Changes data_array in calling code!!!
     '''
 
     # Convert data_array into int16 values by removing the offset
