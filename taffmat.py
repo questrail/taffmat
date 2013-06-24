@@ -541,8 +541,6 @@ def write_taffmat_slice(data_array, header_data, output_base_filename,
     sliced_data_array = data_array_copy[:, starting_data_index:ending_data_index+1]
     sliced_header_data = header_data
 
-    print('id(sliced_data_array) = {}'.format(id(sliced_data_array)))
-
     # Calculate number of samples
     new_number_of_samples = ending_data_index + 1 - starting_data_index
 
