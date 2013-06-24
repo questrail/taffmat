@@ -529,8 +529,16 @@ def write_taffmat_slice(data_array, header_data, output_base_filename,
     based on the starting and ending data points to be written.
     '''
 
+    # TODO(mdr): Add a check to determine if the data_array is beyond
+    # the range in the header.and if so log it.
+
+    # Since slices are simply views into the original array, we need
+    # to copy the array before performing the ADC conversion required
+    # by the LX-10 when storing data as integers.
+    data_array_copy = data_array.copy()
+
     # Create copies of the originals
-    sliced_data_array = data_array[:, starting_data_index:ending_data_index+1]
+    sliced_data_array = data_array_copy[:, starting_data_index:ending_data_index+1]
     sliced_header_data = header_data
 
     # Calculate number of samples
