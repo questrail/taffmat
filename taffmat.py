@@ -455,7 +455,6 @@ def read_taffmat(input_file):
     Raises:
         N/A
     '''
-
     # If the input_file contains the extension .dat or .hdr,
     # strip that off to create the input_file_basename
     # and then create both the .dat and .hdr filenames
@@ -464,18 +463,21 @@ def read_taffmat(input_file):
 
     if input_file_extension.lower() in ['.dat', '.hdr']:
         # The input_file contained the extension of .dat or .hdr
-        input_dat_file = '{base}.dat'.format(base=input_file_basename)
-        input_hdr_file = '{base}.hdr'.format(base=input_file_basename)
+        input_dat_file = '{base}.DAT'.format(base=input_file_basename)
+        input_hdr_file = '{base}.HDR'.format(base=input_file_basename)
     else:
         # The input_file didn't contain an extension, so append .dat and .hdr
         # TODO: Add unit tests to make sure we're properly handling
         # input_file with .dat, .hdr, or no extension
-        input_dat_file = '{base}.dat'.format(base=input_file)
-        input_hdr_file = '{base}.hdr'.format(base=input_file)
+        input_dat_file = '{base}.DAT'.format(base=input_file)
+        input_hdr_file = '{base}.HDR'.format(base=input_file)
 
     if (not os.path.isfile(input_dat_file) or
             not os.path.isfile(input_hdr_file)):
         # The .dat or .hdr file doesn't exist, so exit
+        # FIXME(mdr): Throw an exception with a reasonable error!!!
+        # Right now I'll get "TypeError: 'bool' object is not iterable"
+        # if the file doesn't exist. That wasted 15 minutes.
         # FIXME: What error code, if any should I be returning?
         #sys.exit('Input files do not exist')
         return False
