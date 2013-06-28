@@ -31,7 +31,7 @@ The following data recorders store their data in the TAFFmat file format:
 ## Installation
 
 You can install [taffmat] either via the Python Package Index (PyPI) or
-from source:
+from source.
 
 To install using pip:
 
@@ -45,7 +45,7 @@ $ pip install taffmat
 
 [taffmat] requires the following Python packages:
 
-* `numpy`
+* [numpy]
 
 ## Contributing
 
@@ -62,7 +62,7 @@ $ git flow init -d
 $ git flow feature start <your_feature>
 ```
 
-When you're done coding and commiting the changes for `your_feature`,
+When you're done coding and committing the changes for `your_feature`,
 issue:
 
 ```bash
@@ -73,15 +73,16 @@ Then open a pull request to `your_feature` branch.
 
 ## License
 
-[taffmat] is release under the MIT license. Please see the [LICENSE.txt]
+[taffmat] is released under the MIT license. Please see the [LICENSE.txt]
 file for more information.
 
+[taffmat]: https://github.com/questrail/applyaf
 [LX-10/20]: http://www.teac.co.jp/en/industry/measurement/datarecorder/lx10/index.html
 [LX-110/120]: http://teac-ipd.com/data-recorders/lx-110120/
 [WX-7000 Series]: http://teac-ipd.com/data-recorders/wx-7000-series/
 [es8]: http://teac-ipd.com/data-recorders/es8/
-[taffmat]: https://github.com/questrail/applyaf
 [LICENSE.txt]: https://github.com/questrail/applyaf/blob/develop/LICENSE.txt
 [git-flow]: https://github.com/nvie/gitflow
 [nvie-git]: http://nvie.com/posts/a-successful-git-branching-model/
 [install git-flow]: https://github.com/nvie/gitflow/wiki/Installation
+[numpy]: http://www.numpy.org
