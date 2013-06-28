@@ -65,7 +65,9 @@ $ git flow feature start <your_feature>
 When you're done coding and commiting the changes for `your_feature`,
 issue:
 
-  git flow feature publish <your_feature>
+```bash
+$ git flow feature publish <your_feature>
+```
 
 Then open a pull request to `your_feature` branch.
 
