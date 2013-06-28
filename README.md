@@ -35,7 +35,9 @@ from source:
 
 To install using pip:
 
-    $ pip install taffmat
+```bash
+$ pip install taffmat
+```
 
 **Source:** https://github.com/questrail/taffmat
 
@@ -47,16 +49,18 @@ To install using pip:
 
 ## Contributing
 
-[taffmat] is developed using [git-flow]---"git extensions to
+[taffmat] is developed using [git-flow], which are "git extensions to
 provide high-level repository operations for [Vincent Driessen's branching
 model][nvie-git]." To contribute, [install git-flow], fork [taffmat], and
 then run:
 
-  git clone git@github.com:<username>/taffmat.git
-  cd taffmat
-  git branch master origin/master
-  git flow init -d
-  git flow feature start <your_feature>
+```bash
+$ git clone git@github.com:<username>/taffmat.git
+$ cd taffmat
+$ git branch master origin/master
+$ git flow init -d
+$ git flow feature start <your_feature>
+```
 
 When you're done coding and commiting the changes for `your_feature`,
 issue:
