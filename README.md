@@ -2,7 +2,7 @@
 
 A Python module for reading and writing Teac TAFFmat files.
 
-# About the TAFFmat file format
+## About the TAFFmat file format
 
 TAFFmat is Teac's proprietary file format used to store data from their
 LX series and other data recorders.
@@ -19,7 +19,7 @@ According to the Teac "LX Series Recording Unit Instruction Manual":
 
 TAFFmat is a trademark of Teac Corporation.
 
-## Data Recorders Using TAFFmat
+### Data Recorders Using TAFFmat
 
 The following data recorders store their data in the TAFFmat file format:
 
@@ -28,7 +28,7 @@ The following data recorders store their data in the TAFFmat file format:
 * Teac [WX-7000 Series]
 * Teac [es8]
 
-# Installation
+## Installation
 
 You can install [taffmat] either via the Python Package Index (PyPI) or
 from source:
@@ -39,15 +39,15 @@ To install using pip:
 
 **Source:** https://github.com/questrail/taffmat
 
-# Requirements
+## Requirements
 
 [taffmat] requires the following Python packages:
 
 * `numpy`
 
-# Contributing
+## Contributing
 
-# [taffmat] is developed using [git-flow]---"git extensions to
+[taffmat] is developed using [git-flow]---"git extensions to
 provide high-level repository operations for [Vincent Driessen's branching
 model][nvie-git]." To contribute, [install git-flow], fork [taffmat], and
 then run:
@@ -65,7 +65,7 @@ issue:
 
 Then open a pull request to `your_feature` branch.
 
-# License
+## License
 
 [taffmat] is release under the MIT license. Please see the [LICENSE.txt]
 file for more information.
