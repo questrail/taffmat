@@ -79,4 +79,4 @@ file for more information.
 [pull request]: https://help.github.com/articles/using-pull-requests
 [scott chacon]: http://scottchacon.com/about.html
 [taffmat]: https://github.com/questrail/applyaf
-[WX-7000 Series]: http://teac-ipd.com/data-recorders/wx-7000-series/
+[WX-7000 Series]: http://teac-ipd.com/wx-7000/
