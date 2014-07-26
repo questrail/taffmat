@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-taffmat.py
-
-Read and write Teac TAFFmat files.
+# Copyright (c) 2014 The taffmat developers. All rights reserved.
+# Project site: https://github.com/quest/taffmat
+# Use of this source code is governed by a MIT-style license that
+# can be found in the LICENSE.txt file for the project.
+"""Read and write Teac TAFFmat files.
 
 The .dat file is read into a numpy array.
 The .hdr file is read into an OrderedDict
@@ -52,7 +53,6 @@ from __future__ import absolute_import
 
 # Standard module imports
 import os
-import sys
 from datetime import datetime
 from collections import OrderedDict
 
@@ -316,7 +316,7 @@ def _read_taffmat_dat(input_dat_file, file_type, number_of_series,
     # Read the entire file and reshape the data so that each channel/series
     # is in its own row
     with open(input_dat_file, 'rb') as datfile:
-        data_array = np.fromfile(datfile, np.int16).reshape(
+        data_array = np.fromfile(datfile, data_size).reshape(
             (-1, number_of_series)).T
 
     data_array = _apply_slope_and_offset(data_array,
@@ -382,10 +382,10 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
             '{channel_key} {amp_type},{range_setting},{filter_setting}'.format(
                 channel_key=channel_key,
                 amp_type=header_data['channel_info'][index]['amp_type'],
-                range_setting=
-                header_data['channel_info'][index]['range_setting'],
-                filter_setting=
-                header_data['channel_info'][index]['filter_setting']))
+                range_setting=header_data[
+                    'channel_info'][index]['range_setting'],
+                filter_setting=header_data[
+                    'channel_info'][index]['filter_setting']))
     header_output.append('ID_NO {id_num}'.format(id_num=header_data['id_num']))
     header_output.append('TIME {start},{end}'.format(
         start=header_data['start_time'],
@@ -479,7 +479,7 @@ def read_taffmat(input_file):
         # Right now I'll get "TypeError: 'bool' object is not iterable"
         # if the file doesn't exist. That wasted 15 minutes.
         # FIXME: What error code, if any should I be returning?
-        #sys.exit('Input files do not exist')
+        # sys.exit('Input files do not exist')
         return False
 
     # Read the hdr file
@@ -540,7 +540,8 @@ def write_taffmat_slice(data_array, header_data, output_base_filename,
     data_array_copy = data_array.copy()
 
     # Create copies of the originals
-    sliced_data_array = data_array_copy[:, starting_data_index:ending_data_index+1]
+    sliced_data_array = data_array_copy[
+        :, starting_data_index:ending_data_index+1]
     sliced_header_data = header_data
 
     # Calculate number of samples
