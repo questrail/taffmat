@@ -72,11 +72,11 @@ file for more information.
 
 [es8]: http://teac-ipd.com/data-recorders/es8/
 [github flow]: http://scottchacon.com/2011/08/31/github-flow.html
-[LICENSE.txt]: https://github.com/questrail/applyaf/blob/develop/LICENSE.txt
+[LICENSE.txt]: https://github.com/questrail/taffmat/blob/develop/LICENSE.txt
 [LX-10/20]: http://www.teac.co.jp/en/industry/measurement/datarecorder/lx10/index.html
 [LX-110/120]: http://teac-ipd.com/data-recorders/lx-110120/
 [numpy]: http://www.numpy.org
 [pull request]: https://help.github.com/articles/using-pull-requests
 [scott chacon]: http://scottchacon.com/about.html
-[taffmat]: https://github.com/questrail/applyaf
+[taffmat]: https://github.com/questrail/taffmat
 [WX-7000 Series]: http://teac-ipd.com/wx-7000/
