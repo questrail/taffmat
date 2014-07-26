@@ -265,7 +265,7 @@ class TestWritingTAFFmatFile(unittest.TestCase):
         self.assertEqual(
             source_hdr_contents_no_blank_lines,
             output_hdr_contents_no_blank_lines,
-            'Source and output header files are not the same '
+            'Source and output header files are not the same ' +
             '(excluding blank lines).')
 
 
