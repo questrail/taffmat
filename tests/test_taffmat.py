@@ -217,9 +217,9 @@ class TestWritingTAFFmatFile(unittest.TestCase):
 
     def tearDown(self):
         # Need to delete the test output file
-        output_dat_filename = '{base}.dat'.format(
+        output_dat_filename = '{base}.DAT'.format(
             base=self.output_base_filename)
-        output_hdr_filename = '{base}.hdr'.format(
+        output_hdr_filename = '{base}.HDR'.format(
             base=self.output_base_filename)
         try:
             os.remove(output_dat_filename)
@@ -232,8 +232,8 @@ class TestWritingTAFFmatFile(unittest.TestCase):
             print("Couldn't remove the test hdr file.")
 
     def _get_dat_hdr_filenames_from_base(self, base_filename):
-        dat_filename = '{base}.dat'.format(base=base_filename)
-        hdr_filename = '{base}.hdr'.format(base=base_filename)
+        dat_filename = '{base}.DAT'.format(base=base_filename)
+        hdr_filename = '{base}.HDR'.format(base=base_filename)
         return dat_filename, hdr_filename
 
     def test_writing_data_array(self):
@@ -246,11 +246,7 @@ class TestWritingTAFFmatFile(unittest.TestCase):
             data_files_equal,
             'Saved dat file does not equal source dat file.')
 
-    def test_writing_header_file(self):
-        '''
-        Compare the header file written using taffmat.py against the original
-        TAFFmat header file created by the LX-10
-        '''
+    def test_writing_header_file_and_compare_with_original_taffmat(self):
         source_dat, source_hdr = self._get_dat_hdr_filenames_from_base(
             self.input_base_filename)
         output_dat, output_hdr = self._get_dat_hdr_filenames_from_base(
