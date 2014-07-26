@@ -1,5 +1,7 @@
 # taffmat
 
+[![Build Status][travis image]][travis link]
+
 A Python module for reading and writing Teac TAFFmat files.
 
 ## About the TAFFmat file format
@@ -79,4 +81,6 @@ file for more information.
 [pull request]: https://help.github.com/articles/using-pull-requests
 [scott chacon]: http://scottchacon.com/about.html
 [taffmat]: https://github.com/questrail/taffmat
+[travis image]: https://travis-ci.org/questrail/taffmat.png?branch=master
+[travis link]: https://travis-ci.org/questrail/taffmat
 [WX-7000 Series]: http://teac-ipd.com/wx-7000/

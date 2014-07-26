@@ -1,0 +1,15 @@
+language: python
+python:
+- '2.6'
+- '2.7'
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+script: nosetests --with-coverage --cover-package=taffmat
+after_success:
+  coveralls
+deploy:
+  provider: pypi
+  user: mdrpypi
+  password:
+    secure: NuAyLbTylUd/9gjVh5XwbF/IlG+ebkMSlAK/zVrDNlK0qsbReKI8kKsWsEkpGgxYjVwJeyquFNVSlQC3XwcKm3i4lrUBdlSUCapFmcs/cmnqWHW2VgtCxcgL76JmwkyIVcg9IrdA4izo11k9gmm+ve+Shgh3e0wlln4xpuGdLhE=
