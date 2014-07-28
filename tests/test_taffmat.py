@@ -1,10 +1,17 @@
+# Try to future proof code so that it's Python 3.x ready
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+
+# Imports from the Python Standard Library
 import filecmp
 import os
 import re
 import unittest
 
+# Other imports
 import numpy as np
-
 import taffmat
 
 
@@ -264,9 +271,7 @@ class TestWritingTAFFmatFile(unittest.TestCase):
             lambda x: not re.match(r'^\s*$', x), output_hdr_contents)
         self.assertEqual(
             source_hdr_contents_no_blank_lines,
-            output_hdr_contents_no_blank_lines,
-            'Source and output header files are not the same ' +
-            '(excluding blank lines).')
+            output_hdr_contents_no_blank_lines)
 
 
 class TestWritingTAFFmatFileSlice(unittest.TestCase):
