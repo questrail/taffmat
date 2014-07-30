@@ -1,6 +1,7 @@
 # taffmat
 
 [![Build Status][travis image]][travis link]
+[![PyPi Version][pypi ver image]][pypi ver link]
 
 A Python module for reading and writing Teac TAFFmat files.
 
@@ -69,8 +70,8 @@ a pull request.  [GitHub Flow][] is summarized as:
 
 ## License
 
-[taffmat] is released under the MIT license. Please see the [LICENSE.txt]
-file for more information.
+[taffmat][] is released under the MIT license. Please see the
+[LICENSE.txt][] file for more information.
 
 [es8]: http://teac-ipd.com/data-recorders/es8/
 [github flow]: http://scottchacon.com/2011/08/31/github-flow.html
@@ -79,6 +80,8 @@ file for more information.
 [LX-110/120]: http://teac-ipd.com/data-recorders/lx-110120/
 [numpy]: http://www.numpy.org
 [pull request]: https://help.github.com/articles/using-pull-requests
+[pypi ver image]: https://badge.fury.io/py/taffmat.png
+[pypi ver link]: http://badge.fury.io/py/taffmat
 [scott chacon]: http://scottchacon.com/about.html
 [taffmat]: https://github.com/questrail/taffmat
 [travis image]: https://travis-ci.org/questrail/taffmat.png?branch=master
