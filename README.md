@@ -2,6 +2,7 @@
 
 [![Build Status][travis image]][travis link]
 [![PyPi Version][pypi ver image]][pypi ver link]
+[![Coverage Status][coveralls image]][coveralls link]
 
 A Python module for reading and writing Teac TAFFmat files.
 
@@ -73,6 +74,8 @@ a pull request.  [GitHub Flow][] is summarized as:
 [taffmat][] is released under the MIT license. Please see the
 [LICENSE.txt][] file for more information.
 
+[coveralls image]: https://coveralls.io/repos/questrail/taffmat/badge.png
+[coveralls link]: https://coveralls.io/r/questrail/taffmat
 [es8]: http://teac-ipd.com/data-recorders/es8/
 [github flow]: http://scottchacon.com/2011/08/31/github-flow.html
 [LICENSE.txt]: https://github.com/questrail/taffmat/blob/develop/LICENSE.txt
