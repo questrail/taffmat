@@ -7,7 +7,6 @@ from __future__ import absolute_import
 # Imports from the Python Standard Library
 import filecmp
 import os
-import re
 import unittest
 
 # Other imports
@@ -259,19 +258,36 @@ class TestWritingTAFFmatFile(unittest.TestCase):
         output_dat, output_hdr = self._get_dat_hdr_filenames_from_base(
             self.output_base_filename)
         with open(source_hdr, 'r') as hdr_source_file:
-            source_hdr_contents = hdr_source_file.read()
+            source_hdr_contents = hdr_source_file.read().split('\r\n')
         with open(output_hdr, 'r') as hdr_output_file:
-            output_hdr_contents = hdr_output_file.read()
-        # FIXME: Instead of stripping out all blank lines, I should probably
-        # only strip out blank lines that are at the end of the TAFFmat hdr
-        # file.
-        source_hdr_contents_no_blank_lines = filter(
-            lambda x: not re.match(r'^\s*$', x), source_hdr_contents)
-        output_hdr_contents_no_blank_lines = filter(
-            lambda x: not re.match(r'^\s*$', x), output_hdr_contents)
-        self.assertEqual(
-            source_hdr_contents_no_blank_lines,
-            output_hdr_contents_no_blank_lines)
+            output_hdr_contents = hdr_output_file.read().split('\r\n')
+        source_hdr_contents_no_whitespace = \
+            [s.strip() for s in source_hdr_contents]
+        output_hdr_contents_no_whitespace = \
+            [s.strip() for s in output_hdr_contents]
+        self.assertEqual(source_hdr_contents_no_whitespace[1:],
+                         output_hdr_contents_no_whitespace[1:])
+
+    def test_writing_different_dataset_filename(self):
+        new_output_base_filename = 'something_different'
+        taffmat.write_taffmat(self.data_array,
+                              self.header_data,
+                              new_output_base_filename)
+        data_array, time_vector, header_data = taffmat.read_taffmat(
+            new_output_base_filename)
+        self.assertEqual(header_data['dataset'],
+                         new_output_base_filename.upper())
+        new_output_dat, new_output_hdr = \
+            self._get_dat_hdr_filenames_from_base(new_output_base_filename)
+        try:
+            os.remove(new_output_dat)
+        except:
+            print("Couldn't remove the test dat file.")
+
+        try:
+            os.remove(new_output_hdr)
+        except:
+            print("Couldn't remove the test hdr file.")
 
 
 class TestWritingTAFFmatFileSlice(unittest.TestCase):

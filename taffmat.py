@@ -333,11 +333,13 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
     Write the TAFFmat .hdr file
     '''
     print('output_hdr_filename =', output_hdr_filename)
+    output_hdr_filename_root, output_hdr_filename_extension = \
+        os.path.splitext(os.path.basename(output_hdr_filename))
 
     # Convert "smart" dictionary items into strings that are
     # ready to be saved to the .hdr text file.
     header_output = []
-    header_output.append('DATASET {}'.format(header_data['dataset']))
+    header_output.append('DATASET {}'.format(output_hdr_filename_root.upper()))
     header_output.append('VERSION {}'.format(header_data['version']))
     header_output.append('SERIES ' + ','.join(
         header_data['series_labels']) + ' ')
@@ -370,13 +372,13 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
     header_output.append('SLOT1_AMP {id},{num_ch},{pld_ver},{fw_ver}'.format(
         id=header_data['slot1_amp']['id_name'],
         num_ch=header_data['slot1_amp']['num_of_channels'],
-        pld_ver=header_data['slot1_amp']['pld_version'].ljust(8, ' '),
-        fw_ver=header_data['slot1_amp']['firmware_version'].ljust(8, ' ')))
+        pld_ver=header_data['slot1_amp']['pld_version'].ljust(8),
+        fw_ver=header_data['slot1_amp']['firmware_version'].ljust(8)))
     header_output.append('SLOT2_AMP {id},{num_ch},{pld_ver},{fw_ver}'.format(
         id=header_data['slot2_amp']['id_name'],
         num_ch=header_data['slot2_amp']['num_of_channels'],
-        pld_ver=header_data['slot2_amp']['pld_version'],
-        fw_ver=header_data['slot2_amp']['firmware_version']))
+        pld_ver=header_data['slot2_amp']['pld_version'].ljust(8),
+        fw_ver=header_data['slot2_amp']['firmware_version'].ljust(8)))
     for index in range(header_data['number_of_series']):
         channel_key = 'CH{channel_num}_{channel_num}'.format(
             channel_num=index + 1)
