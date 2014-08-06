@@ -83,7 +83,7 @@ a pull request.  [GitHub Flow][] is summarized as:
 [LX-110/120]: http://teac-ipd.com/data-recorders/lx-110120/
 [numpy]: http://www.numpy.org
 [pull request]: https://help.github.com/articles/using-pull-requests
-[pypi ver image]: https://badge.fury.io/py/taffmat.png
+[pypi ver image]: https://badge.fury.io/py/taffmat.svg
 [pypi ver link]: http://badge.fury.io/py/taffmat
 [scott chacon]: http://scottchacon.com/about.html
 [taffmat]: https://github.com/questrail/taffmat
