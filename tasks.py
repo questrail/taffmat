@@ -31,6 +31,7 @@ def release(deploy=False, test=False, version=''):
             run("git tag -a v{ver} -m 'v{ver}'".format(ver=version))
             run("git push")
             run("git push origin --tags")
+            run("python setup.py register sdist upload")
     else:
         print("* Have you updated the version in taffmat.py?")
         print("* Have you updated CHANGES.md?")
