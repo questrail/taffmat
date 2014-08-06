@@ -2,7 +2,7 @@
 
 ## develop (unreleased)
 
-## 0.2.1/0.2.2/0.2.3 (August 6, 2014)
+## 0.2.1/0.2.2/0.2.3/0.2.4 (August 6, 2014)
 
 ### Bug Fixes
 
