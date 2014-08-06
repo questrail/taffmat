@@ -59,6 +59,8 @@ from collections import OrderedDict
 # Data analysis related imports
 import numpy as np
 
+__version__ = '0.2'
+
 
 def _append_windows_newlines(input_list_of_strings):
     '''Append Windows style newlines to list of strings.
