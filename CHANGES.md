@@ -2,6 +2,12 @@
 
 ## develop (unreleased)
 
+## 0.2.1 (August 6, 2014)
+
+### Bug Fixes
+
+- PyPi automated deployment via Travis-CI
+
 ## 0.2 (August 6, 2014)
 
 ### Features
