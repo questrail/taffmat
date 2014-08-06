@@ -1,20 +1,19 @@
 language: python
 os:
-  - linux
-  - osx
+- linux
+- osx
 python:
-  - '2.7'
+- '2.7'
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
+- pip install -r requirements.txt
+- pip install coveralls
 script: nosetests --with-coverage --cover-package=taffmat
-after_success:
-  coveralls
+after_success: coveralls
 deploy:
   provider: pypi
   user: mdrpypi
   password:
-    secure: NuAyLbTylUd/9gjVh5XwbF/IlG+ebkMSlAK/zVrDNlK0qsbReKI8kKsWsEkpGgxYjVwJeyquFNVSlQC3XwcKm3i4lrUBdlSUCapFmcs/cmnqWHW2VgtCxcgL76JmwkyIVcg9IrdA4izo11k9gmm+ve+Shgh3e0wlln4xpuGdLhE=
+    secure: 8v1g9ScIbgasoWjlsuimA32v066w9ZwEqLjeXY1jUTArhy3WSyk4OTnCPMJ6ZanYqDVumYlVHCBzZZEXSolKViQF5AIS6qY1/qsbtph4Arg+QiC8/Wk4QNSdiK90N+k6clSQI/Jr4i8DuDKsIPqSiZgoEXgK58aauVDYgBWZbYg=
   on:
-    all_branches: true
     tags: true
+    repo: questrail/taffmat
