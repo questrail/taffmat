@@ -29,7 +29,8 @@ def release(deploy=False, test=False, version=''):
         if version:
             run("git checkout master")
             run("git tag -a v{ver} -m 'v{ver}'".format(ver=version))
-            run("git push origin master --tags")
+            run("git push")
+            run("git push origin --tags")
     else:
         print("* Have you updated the version in taffmat.py?")
         print("* Have you updated CHANGES.md?")
