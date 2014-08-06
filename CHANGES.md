@@ -2,6 +2,12 @@
 
 ## develop (unreleased)
 
+## 0.2.9/0.2.10 (August 6, 2014)
+
+### Bug Fixes
+
+- Update DATASET filed when writing .HDR file [issue-6][]
+
 ## 0.2.1-0.2.8 (August 6, 2014)
 
 ### Bug Fixes
@@ -42,4 +48,5 @@
 [issue-3]: https://github.com/questrail/taffmat/issues/3
 [issue-4]: https://github.com/questrail/taffmat/issues/4
 [issue-5]: https://github.com/questrail/taffmat/issues/5
+[issue-6]: https://github.com/questrail/taffmat/issues/6
 [issue-7]: https://github.com/questrail/taffmat/issues/7
