@@ -2,6 +2,12 @@
 
 ## develop (unreleased)
 
+## 0.3 (August 7, 2014)
+
+### Features
+
+- Made Python 3.3 & 3.4 compatible [isuee-8][]
+
 ## 0.2.9/0.2.10 (August 6, 2014)
 
 ### Bug Fixes
@@ -18,16 +24,16 @@
 
 ### Features
 
-- Travis-CI testing and PyPi deployment [issue-1][]
+- Travis-CI testing and PyPi deployment ([issue-1][])
 - Added function to change slope
-- Write slices of `data_array` [issue-3][]
-- Add test for writing slice [issue-4][]
+- Write slices of `data_array` ([issue-3][])
+- Add test for writing slice ([issue-4][])
 - Changed to uppercase `.HDR` and `.DAT`
-- Remove voice memo when saving slice [issue-7][]
+- Remove voice memo when saving slice ([issue-7][])
 
 ### Bug Fixes
 
-- Use Windows carriage returns in `.HDR` file [issue-5][]
+- Use Windows carriage returns in `.HDR` file ([issue-5][])
 
 ## 0.1.2 (February 11, 2013)
 
@@ -50,3 +56,4 @@
 [issue-5]: https://github.com/questrail/taffmat/issues/5
 [issue-6]: https://github.com/questrail/taffmat/issues/6
 [issue-7]: https://github.com/questrail/taffmat/issues/7
+[issue-8]: https://github.com/questrail/taffmat/issues/8

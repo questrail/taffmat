@@ -4,7 +4,8 @@
 [![PyPi Version][pypi ver image]][pypi ver link]
 [![Coverage Status][coveralls image]][coveralls link]
 
-A Python module for reading and writing Teac TAFFmat files.
+A Python (2.7, 3.3, 3.4) module for reading and writing Teac TAFFmat
+files.
 
 ## About the TAFFmat file format
 
