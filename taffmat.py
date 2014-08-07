@@ -59,7 +59,7 @@ from collections import OrderedDict
 # Data analysis related imports
 import numpy as np
 
-__version__ = '0.3'
+__version__ = '0.3.2'
 
 
 def _append_windows_newlines(input_list_of_strings):

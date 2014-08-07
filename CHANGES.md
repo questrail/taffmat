@@ -2,7 +2,7 @@
 
 ## develop (unreleased)
 
-## 0.3 (August 7, 2014)
+## 0.3/0.3.2 (August 7, 2014)
 
 ### Features
 
