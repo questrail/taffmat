@@ -45,7 +45,7 @@ setup(
     author_email='matthew@questrail.com',
     py_modules=['taffmat'],
     url='http://github.com/questrail/taffmat',
-    license='LICENSE.txt',
+    license='MIT',
     description='Read and write Teac TAFFmat files.',
     long_description=long_description,
     requires=['numpy (>=1.6.0)'],

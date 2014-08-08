@@ -1,8 +1,9 @@
 # taffmat
 
-[![Build Status][travis image]][travis link]
 [![PyPi Version][pypi ver image]][pypi ver link]
+[![Build Status][travis image]][travis link]
 [![Coverage Status][coveralls image]][coveralls link]
+[![License Badge][license image]][LICENSE.txt]
 
 A Python (2.7, 3.3, 3.4) module for reading and writing Teac TAFFmat
 files.
@@ -75,19 +76,20 @@ a pull request.  [GitHub Flow][] is summarized as:
 [taffmat][] is released under the MIT license. Please see the
 [LICENSE.txt][] file for more information.
 
-[coveralls image]: https://coveralls.io/repos/questrail/taffmat/badge.png
+[coveralls image]: http://img.shields.io/coveralls/questrail/taffmat/master.svg
 [coveralls link]: https://coveralls.io/r/questrail/taffmat
 [es8]: http://teac-ipd.com/data-recorders/es8/
 [github flow]: http://scottchacon.com/2011/08/31/github-flow.html
-[LICENSE.txt]: https://github.com/questrail/taffmat/blob/develop/LICENSE.txt
+[LICENSE.txt]: https://github.com/questrail/taffmat/blob/master/LICENSE.txt
+[license image]: http://img.shields.io/pypi/l/taffmat.svg
 [LX-10/20]: http://www.teac.co.jp/en/industry/measurement/datarecorder/lx10/index.html
 [LX-110/120]: http://teac-ipd.com/data-recorders/lx-110120/
 [numpy]: http://www.numpy.org
 [pull request]: https://help.github.com/articles/using-pull-requests
-[pypi ver image]: https://badge.fury.io/py/taffmat.svg
-[pypi ver link]: http://badge.fury.io/py/taffmat
+[pypi ver image]: http://img.shields.io/pypi/v/taffmat.svg
+[pypi ver link]: https://pypi.python.org/pypi/taffmat/
 [scott chacon]: http://scottchacon.com/about.html
 [taffmat]: https://github.com/questrail/taffmat
-[travis image]: https://travis-ci.org/questrail/taffmat.png?branch=master
+[travis image]: http://img.shields.io/travis/questrail/taffmat/master.svg
 [travis link]: https://travis-ci.org/questrail/taffmat
 [WX-7000 Series]: http://teac-ipd.com/wx-7000/
