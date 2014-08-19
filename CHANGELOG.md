@@ -4,6 +4,12 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+## v0.3.4 - 2014-08-19
+
+### Bug Fixes
+- `pip install taffmat` failed because `README.md` was missing. Fixed by
+  replacing `README.rst` in the `MANIFSET.in` with `README.md`
+
 ## v0.3.3 - 2014-08-08
 
 - Moved AUTHORS.txt to AUTHORS.md
