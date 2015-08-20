@@ -4,6 +4,16 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+## v0.4.0 - 2015-08-20
+
+### Added
+- Invoke `inv test` task now provides coverage report.
+
+### Changed
+- Migrated from Travis legacy to container-based infrastructure
+- Updated numpy to 1.9.2
+- Updated other pip requirements
+
 ## v0.3.4 - 2014-08-19
 
 ### Bug Fixes

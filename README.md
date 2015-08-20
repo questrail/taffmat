@@ -53,6 +53,19 @@ $ pip install taffmat
 
 * [numpy][]
 
+## Public API
+
+The following functions are provided:
+
+- `change_slope(data_array, series, gain)`
+- `read_taffmat(input_file)`
+- `write_taffmat(data_array, header_data, output_base_filename)`
+- `write_taffmat_slice(data_array, header_data, output_base_filename,
+                       starting_data_index, ending_data_index`
+
+
+
+
 ## Contributing
 
 [taffmat][] is developed using [Scott Chacon][]'s [GitHub Flow][]. To
