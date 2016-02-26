@@ -52,9 +52,10 @@ from __future__ import division
 from __future__ import absolute_import
 
 # Standard module imports
-import os
-from datetime import datetime
 from collections import OrderedDict
+from datetime import datetime
+import logging
+import os
 
 # Data analysis related imports
 import numpy as np
@@ -92,8 +93,8 @@ def _apply_slope_and_offset(data_array, number_of_series, slope, y_offset):
     """
     data_array = data_array.astype(np.float64)
     for series in range(0, number_of_series):
-        data_array[series] = (data_array[series] * slope[series]
-                              + y_offset[series])
+        data_array[series] = (data_array[series] * slope[series] +
+                              y_offset[series])
 
     return data_array
 
@@ -332,7 +333,7 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
     '''
     Write the TAFFmat .hdr file
     '''
-    print('output_hdr_filename =', output_hdr_filename)
+    logging.info('output_hdr_filename = {}'.format(output_hdr_filename))
     output_hdr_filename_root, output_hdr_filename_extension = \
         os.path.splitext(os.path.basename(output_hdr_filename))
 
