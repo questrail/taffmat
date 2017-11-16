@@ -4,6 +4,11 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+## v1.0.1 - 2017-11-16
+- Bumped version
+
+## v1.0.0 - 2017-11-16
+
 ### Changed
 - Updated dependencies in `requirements.txt`
 - Removed `osx` from `.travis.yml`

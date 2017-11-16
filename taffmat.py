@@ -53,7 +53,7 @@ import os
 # Data analysis related imports
 import numpy as np
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 
 def _append_windows_newlines(input_list_of_strings):
