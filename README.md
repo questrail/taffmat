@@ -5,8 +5,7 @@
 [![Coverage Status][coveralls image]][coveralls link]
 [![License Badge][license image]][LICENSE.txt]
 
-A Python (2.7, 3.3, 3.4) module for reading and writing Teac TAFFmat
-files.
+A Python 3.4+ module for reading and writing Teac TAFFmat files.
 
 ## About the TAFFmat file format
 

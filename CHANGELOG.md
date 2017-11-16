@@ -4,6 +4,13 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+### Changed
+- Updated dependencies in `requirements.txt`
+- Removed `osx` from `.travis.yml`
+
+### Fixed
+- Wrong package was called in test task.
+
 ## v0.4.0 - 2015-08-20
 
 ### Added

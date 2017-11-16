@@ -4,34 +4,34 @@ TESTPYPI = "https://testpypi.python.org/pypi"
 
 
 @task
-def lint():
+def lint(ctx):
     """Run flake8 to lint code"""
-    run("python setup.py flake8")
+    run("python3 setup.py flake8")
 
 
 @task(lint)
-def test():
+def test(ctx):
     """Lint, unit test, and check setup.py"""
     run("nosetests --with-coverage --cover-package=taffmat")
-    run("python setup.py check")
+    run("python3 setup.py check")
 
 
 @task()
-def release(deploy=False, test=False, version=''):
+def release(ctx, deploy=False, test=False, version=''):
     """Tag release, run Travis-CI, and deploy to PyPI
     """
     if test:
-        run("python setup.py check")
-        run("python setup.py register sdist upload --dry-run")
+        run("python3 setup.py check")
+        run("python3 setup.py register sdist upload --dry-run")
 
     if deploy:
-        run("python setup.py check")
+        run("python3 setup.py check")
         if version:
             run("git checkout master")
             run("git tag -a v{ver} -m 'v{ver}'".format(ver=version))
             run("git push")
             run("git push origin --tags")
-            run("python setup.py register sdist upload")
+            run("python3 setup.py register sdist upload")
     else:
         print("* Have you updated the version?")
         print("* Have you updated CHANGES.md?")

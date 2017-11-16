@@ -44,12 +44,6 @@ level is approximately +/-120%." [Source p. 4-5 of Teac manual]
 
 """
 
-# Try to future proof code so that it's Python 3.x ready
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
-
 # Standard module imports
 from collections import OrderedDict
 from datetime import datetime
@@ -59,7 +53,7 @@ import os
 # Data analysis related imports
 import numpy as np
 
-__version__ = '0.4.0'
+__version__ = '1.0.0'
 
 
 def _append_windows_newlines(input_list_of_strings):
