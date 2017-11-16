@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2014 The taffmat developers. All rights reserved.
+# Copyright (c) 2014-2017 The taffmat developers. All rights reserved.
 # Project site: https://github.com/quest/taffmat
 # Use of this source code is governed by a MIT-style license that
 # can be found in the LICENSE.txt file for the project.
@@ -158,7 +157,7 @@ def _read_taffmat_hdr(input_hdr_file):
                     raw_header_data[key.lower() + '2'] = data.strip()
                 else:
                     raw_header_data[key.lower()] = data.strip()
-        except:
+        except Exception:
             raw_header_data[line.lower().strip()] = ''
 
     # Create a "smarter" dictionary based on the raw_header_data
@@ -568,35 +567,3 @@ def write_taffmat_slice(data_array, header_data, output_base_filename,
     write_taffmat(sliced_data_array, sliced_header_data, output_base_filename)
 
     return
-
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('inputfile',
-                        action="store",
-                        help="Input filename excluding extension")
-    parser.add_argument('-o', '--outputfile',
-                        action="store",
-                        help="Output filename including extension")
-    args = parser.parse_args()
-
-    input_file_basename, input_file_extension = (
-        os.path.splitext(os.path.realpath(args.inputfile)))
-    if args.outputfile is None:
-        outputfile = '{base}.csv'.format(base=input_file_basename)
-    else:
-        outputfile = os.path.realpath(args.outputfile)
-
-    print("Start reading the TAFFmat file")
-    data_array, time_vector, header_data = read_taffmat(input_file_basename)
-
-    # Print some information about the data we just grabbed
-    print(
-        "Sampled {num_samples:,} samples over {sample_time:.3f} "
-        "sec at {sampling_freq:,} Hz".format(
-            num_samples=header_data['number_of_samples'],
-            sample_time=(header_data['number_of_samples'] /
-                         header_data['sampling_frequency_hz']),
-            sampling_freq=header_data['sampling_frequency_hz']))
-    print("Resulting in {sec_per_sample:.4e} sec/sample".format(
-        sec_per_sample=(1 / header_data['sampling_frequency_hz'])))
