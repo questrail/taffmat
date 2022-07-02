@@ -47,7 +47,6 @@ level is approximately +/-120%." [Source p. 4-5 of Teac manual]
 # Standard module imports
 from collections import OrderedDict
 from datetime import datetime
-import logging
 import os
 
 # Data analysis related imports
@@ -137,8 +136,11 @@ def _read_taffmat_hdr(input_hdr_file):
     '''
 
     # Read in all lines from the .hdr file
-    with open(input_hdr_file, 'r') as f_header:
-        header_data_all_lines = f_header.readlines()
+    try:
+        with open(input_hdr_file, 'r') as f_header:
+            header_data_all_lines = f_header.readlines()
+    except FileNotFoundError:
+        print(f"Sorry, the .hdr file {input_hdr_file} does not exist.")
 
     # Read the header file into an ordered dictionary using the first
     # word of each line as the key.
@@ -146,7 +148,7 @@ def _read_taffmat_hdr(input_hdr_file):
     for line in header_data_all_lines:
         try:
             [key, data] = line.split(' ', 1)
-            if key is not '':
+            if key != '':
                 if key.lower() in raw_header_data:
                     raw_header_data[key.lower() + '2'] = data.strip()
                 else:
@@ -311,9 +313,12 @@ def _read_taffmat_dat(input_dat_file, file_type, number_of_series,
         data_size = np.int16
     # Read the entire file and reshape the data so that each channel/series
     # is in its own row
-    with open(input_dat_file, 'rb') as datfile:
-        data_array = np.fromfile(datfile, data_size).reshape(
-            (-1, number_of_series)).T
+    try:
+        with open(input_dat_file, 'rb') as datfile:
+            data_array = np.fromfile(datfile, data_size).reshape(
+                (-1, number_of_series)).T
+    except FileNotFoundError:
+        print(f"Sorry, the .dat file {input_dat_file} does not exist.")
 
     data_array = _apply_slope_and_offset(data_array,
                                          number_of_series, slope,
@@ -326,7 +331,6 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
     '''
     Write the TAFFmat .hdr file
     '''
-    logging.info('output_hdr_filename = {}'.format(output_hdr_filename))
     output_hdr_filename_root, output_hdr_filename_extension = \
         os.path.splitext(os.path.basename(output_hdr_filename))
 
@@ -472,13 +476,7 @@ def read_taffmat(input_file):
 
     if (not os.path.isfile(input_dat_file) or
             not os.path.isfile(input_hdr_file)):
-        # The .dat or .hdr file doesn't exist, so exit
-        # FIXME(mdr): Throw an exception with a reasonable error!!!
-        # Right now I'll get "TypeError: 'bool' object is not iterable"
-        # if the file doesn't exist. That wasted 15 minutes.
-        # FIXME: What error code, if any should I be returning?
-        # sys.exit('Input files do not exist')
-        return False
+        raise FileNotFoundError("The .dat or .hdr file doesn't exist")
 
     # Read the hdr file
     header_data = _read_taffmat_hdr(input_hdr_file)

@@ -90,8 +90,8 @@ class TestInputFilenames(unittest.TestCase):
         input_file_basename = os.path.join(
             self.test_taffmat_directory,
             'nonexistent_taffmat_file.DAT')
-        self.assertFalse(
-            taffmat.read_taffmat(input_file_basename))
+        with self.assertRaises(FileNotFoundError):
+            taffmat.read_taffmat(input_file_basename)
 
     def test_input_file_with_dat_extension(self):
         # Read in the TAFFmat file under test
@@ -108,7 +108,7 @@ class TestInputFilenames(unittest.TestCase):
         # Read in the TAFFmat file under test
         input_file_basename = os.path.join(
             self.test_taffmat_directory,
-            'UTEST001.DAT')
+            'UTEST001')
         data_array, time_vector, header_data = \
             taffmat.read_taffmat(input_file_basename)
         np.testing.assert_array_equal(
@@ -153,8 +153,6 @@ class TestReadingTAFFmatFile(unittest.TestCase):
                 known_fs=self.known_header['sampling_frequency_hz']))
 
     def test_number_of_data_samples(self):
-        print(self.data_array.shape)
-        print(self.known_data_array.shape)
         self.assertEqual(
             self.data_array.shape, self.known_data_array.shape,
             'data_array.shape = {data_shape} but should have '
@@ -229,12 +227,14 @@ class TestWritingTAFFmatFile(unittest.TestCase):
             base=self.output_base_filename)
         try:
             os.remove(output_dat_filename)
-        except:
+        except OSError as error:
+            print(error)
             print("Couldn't remove the test dat file.")
 
         try:
             os.remove(output_hdr_filename)
-        except:
+        except OSError as error:
+            print(error)
             print("Couldn't remove the test hdr file.")
 
     def _get_dat_hdr_filenames_from_base(self, base_filename):
@@ -281,12 +281,14 @@ class TestWritingTAFFmatFile(unittest.TestCase):
             self._get_dat_hdr_filenames_from_base(new_output_base_filename)
         try:
             os.remove(new_output_dat)
-        except:
+        except OSError as error:
+            print(error)
             print("Couldn't remove the test dat file.")
 
         try:
             os.remove(new_output_hdr)
-        except:
+        except OSError as error:
+            print(error)
             print("Couldn't remove the test hdr file.")
 
 
