@@ -4,6 +4,22 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+### Changed
+
+- Replaced the [Invoke][] `tasks.py` with a [just][] `Justfile`, matching the
+  recipes and groups used by the other questrail projects.
+- Moved to [uv][] and a `pyproject.toml` built by hatchling, replacing
+  `setup.py`, `requirements.txt`, `setup.cfg`, `MANIFEST`, and `MANIFEST.in`.
+- Moved the module to a src layout at `src/taffmat/__init__.py`.
+- Swapped the tooling: ruff for pep8/flake8, pytest for nose2, and ty for
+  mypy. The code was reformatted by ruff and updated to f-strings.
+- Raised the minimum Python to 3.12 and numpy to 2.2.
+
+### Removed
+
+- The `.travis.yml` config and the Travis CI and Coveralls README badges.
+  Neither service runs for this project any more.
+
 ## v1.0.1 - 2017-11-16
 - Bumped version
 
@@ -97,4 +113,7 @@ This file contains all notable changes to the [taffmat][] project.
 [issue-6]: https://github.com/questrail/taffmat/issues/6
 [issue-7]: https://github.com/questrail/taffmat/issues/7
 [issue-8]: https://github.com/questrail/taffmat/issues/8
+[invoke]: https://www.pyinvoke.org/
+[just]: https://just.systems
 [taffmat]: https://github.com/questrail/taffmat
+[uv]: https://docs.astral.sh/uv/

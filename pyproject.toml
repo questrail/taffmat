@@ -1,0 +1,85 @@
+# pyproject.toml
+
+[project]
+name = "taffmat"
+description = "Read and write Teac TAFFmat files"
+readme = "README.md"
+authors = [{ name = "Matthew Rankin", email = "matthew@questrail.com" }]
+requires-python = ">=3.12"
+dependencies = ["numpy>=2.2.0"]
+dynamic = ["version"]
+classifiers = [
+  'Programming Language :: Python',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13',
+  'License :: OSI Approved :: MIT License',
+  'Development Status :: 5 - Production/Stable',
+  'Operating System :: OS Independent',
+  'Intended Audience :: Developers',
+  'Topic :: Software Development :: Libraries :: Python Modules',
+]
+
+[project.urls]
+Homepage = "https://github.com/questrail/taffmat"
+Issues = "https://github.com/questrail/taffmat/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+# The module has always carried its own __version__, so keep that the one
+# place the version is written rather than repeating it here.
+path = "src/taffmat/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/taffmat"]
+
+[tool.hatch.build.targets.sdist]
+# Name what ships rather than taking hatchling's default of everything the
+# .gitignore does not exclude, which would sweep in any scratch data sitting
+# untracked in the working directory.
+include = [
+  "src",
+  "tests",
+  "AUTHORS.md",
+  "CHANGELOG.md",
+  "LICENSE.txt",
+  "README.md",
+  "pyproject.toml",
+]
+
+[tool.ruff]
+# Pin the rule set so that lint results don't drift with the installed ruff.
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "UP",  # pyupgrade
+  "B",   # flake8-bugbear
+  "SIM", # flake8-simplify
+  "EXE", # flake8-executable
+  "PL",  # pylint
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ty.environment]
+# The project uses a src layout, so first-party modules live under src/.
+root = ["./src"]
+
+[tool.ty.src]
+include = ["src"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.16.5",
+    "ty>=0.0.75",
+]

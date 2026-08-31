@@ -1,11 +1,9 @@
 # taffmat
 
 [![PyPi Version][pypi ver image]][pypi ver link]
-[![Build Status][travis image]][travis link]
-[![Coverage Status][coveralls image]][coveralls link]
 [![License Badge][license image]][LICENSE.txt]
 
-A Python 3.4+ module for reading and writing Teac TAFFmat files.
+A Python 3.12+ module for reading and writing Teac TAFFmat files.
 
 ## About the TAFFmat file format
 
@@ -76,18 +74,17 @@ Contributions are welcome! To contribute please:
 
 ## Development Setup
 
-### Development Setup Using pyenv
-
-Use the following commands to create a Python 3.9.9 virtualenv using [pyenv][]
-and [pyenv-virtualenv][], install the requirements in the virtualenv named
-`taffmat`, and list the available [Invoke][] tasks.
+The project is managed with [uv][], and the development tasks are [just][]
+recipes. Use the following commands to create the virtualenv, install the
+dependencies, and list the available recipes.
 
 ```bash
-$ pyenv virtualenv 3.9.9 taffmat
-$ pyenv activate taffmat
-$ pip install -r requirements.txt
-$ inv -l
+$ uv sync
+$ just
 ```
+
+The recipes worth knowing are `just lint` (ruff), `just check` (ty), and
+`just test` (pytest); `just fix` applies the formatting and lint fixes.
 
 
 ## License
@@ -95,23 +92,17 @@ $ inv -l
 [taffmat][] is released under the MIT license. Please see the
 [LICENSE.txt][] file for more information.
 
-[coveralls image]: http://img.shields.io/coveralls/questrail/taffmat/master.svg
-[coveralls link]: https://coveralls.io/r/questrail/taffmat
 [es8]: http://teac-ipd.com/data-recorders/es8/
 [github flow]: http://scottchacon.com/2011/08/31/github-flow.html
-[invoke]: https://www.pyinvoke.org/
+[just]: https://just.systems
 [LICENSE.txt]: https://github.com/questrail/taffmat/blob/master/LICENSE.txt
 [license image]: http://img.shields.io/pypi/l/taffmat.svg
 [LX-10/20]: http://www.teac.co.jp/en/industry/measurement/datarecorder/lx10/index.html
 [LX-110/120]: http://teac-ipd.com/data-recorders/lx-110120/
 [numpy]: http://www.numpy.org
-[pyenv]: https://github.com/pyenv/pyenv
-[pyenv-install]: https://github.com/pyenv/pyenv#installation
-[pyenv-virtualenv]: https://github.com/pyenv/pyenv-virtualenv
 [pull request]: https://help.github.com/articles/using-pull-requests
 [pypi ver image]: http://img.shields.io/pypi/v/taffmat.svg
 [pypi ver link]: https://pypi.python.org/pypi/taffmat/
 [taffmat]: https://github.com/questrail/taffmat
-[travis image]: http://img.shields.io/travis/questrail/taffmat/master.svg
-[travis link]: https://travis-ci.org/questrail/taffmat
+[uv]: https://docs.astral.sh/uv/
 [WX-7000 Series]: http://teac-ipd.com/wx-7000/
