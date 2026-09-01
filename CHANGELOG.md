@@ -18,6 +18,10 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Added
 
+- `just up-all` and a `Justfile` that is otherwise line for line the one
+  in [applyaf][] and [siganalysis][], so that moving between the
+  questrail projects does not mean learning a second set of recipe
+  names.
 - Dependabot keeps the pinned actions and the lock file moving. The
   actions in both workflows are pinned to commit SHAs, so a fix
   published upstream does not reach this repository the way it would
@@ -205,10 +209,12 @@ This file contains all notable changes to the [taffmat][] project.
 [issue-6]: https://github.com/questrail/taffmat/issues/6
 [issue-7]: https://github.com/questrail/taffmat/issues/7
 [issue-8]: https://github.com/questrail/taffmat/issues/8
+[applyaf]: https://github.com/questrail/applyaf
 [invoke]: https://www.pyinvoke.org/
 [just]: https://just.systems
 [PEP 740]: https://peps.python.org/pep-0740/
 [pyright]: https://microsoft.github.io/pyright/
+[siganalysis]: https://github.com/questrail/siganalysis
 [taffmat]: https://github.com/questrail/taffmat
 [ty]: https://github.com/astral-sh/ty
 [trusted publishing]: https://docs.pypi.org/trusted-publishers/

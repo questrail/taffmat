@@ -13,6 +13,12 @@ loc:
 doc term:
   uv run python -m pydoc {{term}}
 
+# Lint and format code using ruff, applying any fixes
+[group('test')]
+fix:
+  uv run ruff check --fix
+  uv run ruff format
+
 # Check lint, formatting, types, and workflows without modifying any files
 [group('test')]
 lint:
@@ -20,12 +26,6 @@ lint:
   uv run ruff format --check
   uv run pyright
   uv run zizmor .github/workflows
-
-# Lint and format code and apply changes
-[group('test')]
-fix:
-  uv run ruff check --fix
-  uv run ruff format
 
 # Test code using pytest
 [group('test')]
@@ -47,10 +47,10 @@ add dep:
 dev dep:
   uv add --dev {{dep}}
 
-# Update dependency in the project dependencies or any group
+# Update dep to the newest ver allowed by pyproject.toml
 [group('dependencies')]
 up dep:
-  uv lock -P {{dep}}
+  uv lock --upgrade-package {{dep}}
   uv sync
 
 # Update all dependencies
