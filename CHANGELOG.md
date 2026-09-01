@@ -15,6 +15,14 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Added
 
+- Continuous integration on GitHub Actions, which this project had none
+  of. Every push and pull request lints, checks formatting, type checks,
+  and runs the suite on 3.12 and 3.13, the versions the classifiers
+  claim. A second job installs the oldest numpy `pyproject.toml` allows,
+  so the floor is a tested promise rather than a hopeful one. A third
+  audits the workflows with [zizmor][], since they are the part of the
+  repository that can mint a PyPI credential. Coverage goes to Coveralls
+  from the 3.13 leg.
 - `scripts/smoke_test_wheel.py`, which installs the built wheel where
   `src/` cannot be reached and checks the version, `__version__`, every
   public function, and `py.typed`. Every other check runs against the
@@ -178,3 +186,4 @@ This file contains all notable changes to the [taffmat][] project.
 [taffmat]: https://github.com/questrail/taffmat
 [ty]: https://github.com/astral-sh/ty
 [uv]: https://docs.astral.sh/uv/
+[zizmor]: https://docs.zizmor.sh/
