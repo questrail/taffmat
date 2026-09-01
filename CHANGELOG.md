@@ -19,6 +19,17 @@ This file contains all notable changes to the [taffmat][] project.
   installing the package. Without the marker a type checker treats an
   installed package as untyped and ignores its annotations.
 
+### Fixed
+
+- `_read_taffmat_hdr()` and `_read_taffmat_dat()` caught the
+  `FileNotFoundError` from opening a file, printed a message, and then
+  carried on to use a variable the `try` block never got to assign,
+  raising `UnboundLocalError` from the line below. `read_taffmat()`
+  checks that both files exist and raises before either is called, so
+  neither block could be reached through the public API; called
+  directly, they now raise the `FileNotFoundError` that `open()` gives
+  rather than printing and failing on the next line.
+
 ### Changed
 
 - The license is declared as an SPDX expression with `license-files`,

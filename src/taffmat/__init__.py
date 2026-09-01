@@ -138,11 +138,8 @@ def _read_taffmat_hdr(input_hdr_file):  # noqa: PLR0912, PLR0915
     """
 
     # Read in all lines from the .hdr file
-    try:
-        with open(input_hdr_file) as f_header:
-            header_data_all_lines = f_header.readlines()
-    except FileNotFoundError:
-        print(f"Sorry, the .hdr file {input_hdr_file} does not exist.")
+    with open(input_hdr_file) as f_header:
+        header_data_all_lines = f_header.readlines()
 
     # Read the header file into an ordered dictionary using the first
     # word of each line as the key.
@@ -320,13 +317,8 @@ def _read_taffmat_dat(input_dat_file, file_type, number_of_series, slope, y_offs
         data_size = np.int16
     # Read the entire file and reshape the data so that each channel/series
     # is in its own row
-    try:
-        with open(input_dat_file, "rb") as datfile:
-            data_array = (
-                np.fromfile(datfile, data_size).reshape((-1, number_of_series)).T
-            )
-    except FileNotFoundError:
-        print(f"Sorry, the .dat file {input_dat_file} does not exist.")
+    with open(input_dat_file, "rb") as datfile:
+        data_array = np.fromfile(datfile, data_size).reshape((-1, number_of_series)).T
 
     data_array = _apply_slope_and_offset(data_array, number_of_series, slope, y_offset)
 
