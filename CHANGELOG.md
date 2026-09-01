@@ -15,6 +15,10 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Added
 
+- `just cov`, which runs the suite under coverage and writes both a
+  terminal summary and `htmlcov/`, and the `pytest-cov` it needs. A
+  floor of 86%, what the suite covers today, means uncovered code has to
+  arrive with either a test or a deliberate edit to that line.
 - `py.typed`, so that the type hints already written reach anyone
   installing the package. Without the marker a type checker treats an
   installed package as untyped and ignores its annotations.

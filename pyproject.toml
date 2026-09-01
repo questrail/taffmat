@@ -73,6 +73,22 @@ select = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = ["--strict-markers", "--strict-config"]
+
+[tool.coverage.run]
+source = ["taffmat"]
+branch = true
+# Coveralls maps the report onto the repository, and absolute paths from a
+# runner's checkout directory are not something it can map.
+relative_files = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
+# A floor rather than a target: set at what the suite covers today, so that
+# uncovered code has to arrive with either a test or a deliberate edit to this
+# line.
+fail_under = 86
 
 [tool.pyright]
 venvPath = "."
@@ -82,5 +98,6 @@ include = ["src", "tests"]
 dev = [
     "pyright>=1.1.411",
     "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
     "ruff>=0.16.5",
 ]
