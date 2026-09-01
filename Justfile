@@ -13,27 +13,28 @@ loc:
 doc term:
   uv run python -m pydoc {{term}}
 
-# Type check using ty
-[group('test')]
-check:
-  uv run ty check
-
-# Lint and format code without making changes
+# Check lint, formatting, and types without modifying any files
 [group('test')]
 lint:
-  uv run ruff format --check
   uv run ruff check
+  uv run ruff format --check
+  uv run pyright
 
 # Lint and format code and apply changes
 [group('test')]
 fix:
-  uv run ruff format
   uv run ruff check --fix
+  uv run ruff format
 
 # Test code using pytest
 [group('test')]
 test *args:
   uv run pytest {{args}}
+
+# Test code and report coverage
+[group('test')]
+cov *args:
+  uv run pytest --cov --cov-report=term --cov-report=html {{args}}
 
 # Add dependency
 [group('dependencies')]
@@ -77,7 +78,7 @@ build:
 
 # Check, test, build, and publish to PyPI
 [group('deploy')]
-deploy: lint check test
+deploy: lint test
   @test -z "$(git status --porcelain)" || { echo "Working tree is dirty"; exit 1; }
   just build
   uv publish

@@ -65,16 +65,13 @@ select = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
-[tool.ty.environment]
-# The project uses a src layout, so first-party modules live under src/.
-root = ["./src"]
-
-[tool.ty.src]
-include = ["src"]
-
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+include = ["src", "tests"]
 [dependency-groups]
 dev = [
+    "pyright>=1.1.411",
     "pytest>=9.0.3",
     "ruff>=0.16.5",
-    "ty>=0.0.75",
 ]

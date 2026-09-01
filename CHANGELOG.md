@@ -32,6 +32,10 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Changed
 
+- Type checking is done by [pyright][] rather than [ty][], which is still
+  a 0.0.x release, matching applyaf and siganalysis. It runs inside
+  `just lint` rather than as a separate `just check` that every caller
+  had to remember. It found the unbound variables recorded above.
 - The license is declared as an SPDX expression with `license-files`,
   which is what replaced the `License ::` classifier that used to carry
   it. It is also what puts `LICENSE.txt` into `dist-info/licenses/`.
@@ -153,5 +157,7 @@ This file contains all notable changes to the [taffmat][] project.
 [issue-8]: https://github.com/questrail/taffmat/issues/8
 [invoke]: https://www.pyinvoke.org/
 [just]: https://just.systems
+[pyright]: https://microsoft.github.io/pyright/
 [taffmat]: https://github.com/questrail/taffmat
+[ty]: https://github.com/astral-sh/ty
 [uv]: https://docs.astral.sh/uv/
