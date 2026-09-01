@@ -39,7 +39,14 @@ The following data recorders store their data in the TAFFmat file format:
 You can install [taffmat][] either via the Python Package Index (PyPI)
 or from source.
 
-To install using pip:
+To add it to a project managed with [uv][], which records it in your
+`pyproject.toml` and lock file:
+
+```bash
+$ uv add taffmat
+```
+
+Or to install it with pip:
 
 ```bash
 $ pip install taffmat
