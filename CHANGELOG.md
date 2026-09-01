@@ -4,18 +4,6 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
-### Removed
-
-- `just deploy`, which published from a laptop with `uv publish` against
-  whatever credentials were lying around. The release workflow replaces
-  it.
-- `AUTHORS.md`, along with the pointer to it in the copyright notice. The
-  notice named "AUTHORS.txt", a file this project has never had under that
-  name, and neither it nor `AUTHORS.md` travels in the wheel: `license-files`
-  carries `LICENSE.txt` into `dist-info/licenses/` and nothing carries the
-  other. The file listed one author, no maintainers, and no contributors,
-  which the git history records more accurately.
-
 ### Added
 
 - Python 3.14 to the classifiers and the CI matrix. The suite passes on
@@ -119,6 +107,16 @@ This file contains all notable changes to the [taffmat][] project.
 - Raised the minimum Python to 3.12 and numpy to 2.2.
 
 ### Removed
+
+- `just deploy`, which published from a laptop with `uv publish` against
+  whatever credentials were lying around. The release workflow replaces
+  it.
+- `AUTHORS.md`, along with the pointer to it in the copyright notice. The
+  notice named "AUTHORS.txt", a file this project has never had under that
+  name, and neither it nor `AUTHORS.md` travels in the wheel: `license-files`
+  carries `LICENSE.txt` into `dist-info/licenses/` and nothing carries the
+  other. The file listed one author, no maintainers, and no contributors,
+  which the git history records more accurately.
 
 - The `.travis.yml` config and the Travis CI and Coveralls README badges.
   Neither service runs for this project any more.
