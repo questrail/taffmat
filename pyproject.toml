@@ -43,7 +43,6 @@ packages = ["src/taffmat"]
 include = [
   "src",
   "tests",
-  "AUTHORS.md",
   "CHANGELOG.md",
   "LICENSE.txt",
   "README.md",

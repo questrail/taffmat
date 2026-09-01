@@ -4,6 +4,15 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+### Removed
+
+- `AUTHORS.md`, along with the pointer to it in the copyright notice. The
+  notice named "AUTHORS.txt", a file this project has never had under that
+  name, and neither it nor `AUTHORS.md` travels in the wheel: `license-files`
+  carries `LICENSE.txt` into `dist-info/licenses/` and nothing carries the
+  other. The file listed one author, no maintainers, and no contributors,
+  which the git history records more accurately.
+
 ### Changed
 
 - Replaced the [Invoke][] `tasks.py` with a [just][] `Justfile`, matching the
