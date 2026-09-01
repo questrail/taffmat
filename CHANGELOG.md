@@ -78,6 +78,10 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Changed
 
+- List `369937+matthewrankin@users.noreply.github.com` as the author
+  address in `pyproject.toml`, replacing a work address. It is what
+  `Author-email` carries in the built metadata and what PyPI shows on the
+  project page, so it changes there from the next release onward.
 - The ruff rule set gains `PT` and `RUF`, which applyaf and siganalysis
   already select, and the reason for selecting a set explicitly is
   written down where the set is. `RUF` found eight values unpacked from
