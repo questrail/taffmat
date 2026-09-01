@@ -15,6 +15,9 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Changed
 
+- `.python-version` is tracked rather than ignored. It decides the
+  interpreter a contributor's `uv sync` builds against, and the file was
+  being read while being excluded from the repository.
 - Replaced the [Invoke][] `tasks.py` with a [just][] `Justfile`, matching the
   recipes and groups used by the other questrail projects.
 - Moved to [uv][] and a `pyproject.toml` built by hatchling, replacing
