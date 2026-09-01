@@ -85,12 +85,87 @@ build: lint test
   uv run --isolated --no-project --with dist/*.whl \
     python scripts/smoke_test_wheel.py "$(uv version --short)"
 
-# Check, test, build, and publish to PyPI
+# Confirm a release can be cut from the tree as it stands
 [group('deploy')]
-deploy: build
+release-check:
   #!/usr/bin/env bash
   set -euo pipefail
   if [ -n "$(git status --porcelain)" ]; then
-    echo "Working tree is dirty" >&2; exit 1
+    echo "Working tree is dirty; commit or stash these first:" >&2
+    git status --short >&2
+    exit 1
   fi
-  uv publish
+  if [ "$(git branch --show-current)" != master ]; then
+    echo "Releases are cut from master" >&2; exit 1
+  fi
+  behind="$(git rev-list --count HEAD..@{upstream} 2>/dev/null || echo 0)"
+  if [ "$behind" != 0 ]; then
+    echo "master is ${behind} commit(s) behind its upstream; pull first" >&2; exit 1
+  fi
+  if [ -z "$({{just_executable()}} unreleased)" ]; then
+    echo "CHANGELOG.md has no entries under Unreleased" >&2; exit 1
+  fi
+  echo "Ready to release from $(uv version --short)."
+
+# Cut a release
+[group('deploy')]
+release: release-check lint test
+  #!/usr/bin/env bash
+  set -euo pipefail
+  # release-check runs first, as a dependency, so that a dirty tree or an
+  # empty Unreleased section is turned away immediately rather than after a
+  # full lint and test run.
+  unreleased="$({{just_executable()}} unreleased)"
+  current="$(uv version --short)"
+  echo
+  echo "Releasing from ${current}, with these entries under Unreleased:"
+  echo
+  sed 's/^./    &/' <<<"$unreleased"
+  echo
+  echo "    1) patch   ${current} -> $(uv version --short --bump patch --dry-run)"
+  echo "    2) minor   ${current} -> $(uv version --short --bump minor --dry-run)"
+  echo "    3) major   ${current} -> $(uv version --short --bump major --dry-run)"
+  echo "    q) cancel"
+  echo
+  read -r -p "Which release? [1] " choice
+  case "${choice:-1}" in
+    1|p|patch) bump=patch ;;
+    2|m|minor) bump=minor ;;
+    3|M|major) bump=major ;;
+    q|Q) echo "Cancelled."; exit 0 ;;
+    *) echo "Unrecognized choice: ${choice}" >&2; exit 1 ;;
+  esac
+  version="$(uv version --short --bump "$bump" --dry-run)"
+  tag="v${version}"
+  if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+    echo "Tag ${tag} already exists" >&2; exit 1
+  fi
+  uv version --bump "$bump" --no-sync
+  uv lock --quiet
+  VERSION="$version" python3 - <<'PY'
+  import datetime, os, pathlib
+  heading = f"## v{os.environ['VERSION']} - {datetime.date.today().isoformat()}"
+  p = pathlib.Path("CHANGELOG.md")
+  s = p.read_text()
+  p.write_text(s.replace("## Unreleased\n", f"## Unreleased\n\n{heading}\n", 1))
+  PY
+  git commit -qam "Release ${tag}"
+  git tag -a "${tag}" -m "${tag}"
+  echo
+  echo "Tagged ${tag}. Publish it with:"
+  echo
+  echo "    git push --follow-tags"
+
+# Print the CHANGELOG entries sitting under Unreleased. Both release-check and
+# release read this, one to refuse an empty section and the other to show what
+# is about to ship, so it is written once here.
+[private]
+unreleased:
+  #!/usr/bin/env python3
+  import pathlib, re
+  m = re.search(
+      r"^## Unreleased\s*\n(.*?)(?=^## v)",
+      pathlib.Path("CHANGELOG.md").read_text(),
+      re.S | re.M,
+  )
+  print((m.group(1).strip() if m else ""))

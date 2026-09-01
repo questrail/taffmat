@@ -6,6 +6,9 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Removed
 
+- `just deploy`, which published from a laptop with `uv publish` against
+  whatever credentials were lying around. The release workflow replaces
+  it.
 - `AUTHORS.md`, along with the pointer to it in the copyright notice. The
   notice named "AUTHORS.txt", a file this project has never had under that
   name, and neither it nor `AUTHORS.md` travels in the wheel: `license-files`
@@ -15,6 +18,21 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Added
 
+- Releases publish from a tag rather than from a laptop. `just release`
+  refuses a dirty tree, a branch other than `master`, a `master` behind
+  its upstream, an empty Unreleased section, or an existing tag; then
+  lints and tests; then shows the entries waiting to ship beside the
+  version each kind of bump would produce, and asks which to cut. It
+  bumps the version, closes out the CHANGELOG, commits, and tags.
+  Pushing the tag is what publishes. `just release-check` runs the
+  refusals on their own.
+- The release workflow waits on the whole CI run before it uploads
+  anything, confirms the tag sits on `master` and matches the version in
+  `pyproject.toml`, and authenticates to PyPI with
+  [trusted publishing][], so there is no API token to paste, store, or
+  leak. It signs a [PEP 740][] attestation for each distribution against
+  the same identity, and creates a GitHub release carrying the CHANGELOG
+  section for that version as its notes.
 - Continuous integration on GitHub Actions, which this project had none
   of. Every push and pull request lints, checks formatting, type checks,
   and runs the suite on 3.12 and 3.13, the versions the classifiers
@@ -182,8 +200,10 @@ This file contains all notable changes to the [taffmat][] project.
 [issue-8]: https://github.com/questrail/taffmat/issues/8
 [invoke]: https://www.pyinvoke.org/
 [just]: https://just.systems
+[PEP 740]: https://peps.python.org/pep-0740/
 [pyright]: https://microsoft.github.io/pyright/
 [taffmat]: https://github.com/questrail/taffmat
 [ty]: https://github.com/astral-sh/ty
+[trusted publishing]: https://docs.pypi.org/trusted-publishers/
 [uv]: https://docs.astral.sh/uv/
 [zizmor]: https://docs.zizmor.sh/
