@@ -13,8 +13,17 @@ This file contains all notable changes to the [taffmat][] project.
   other. The file listed one author, no maintainers, and no contributors,
   which the git history records more accurately.
 
+### Added
+
+- `py.typed`, so that the type hints already written reach anyone
+  installing the package. Without the marker a type checker treats an
+  installed package as untyped and ignores its annotations.
+
 ### Changed
 
+- The license is declared as an SPDX expression with `license-files`,
+  which is what replaced the `License ::` classifier that used to carry
+  it. It is also what puts `LICENSE.txt` into `dist-info/licenses/`.
 - The version is written in `pyproject.toml` rather than in
   `src/taffmat/__init__.py`, and `taffmat.__version__` now reads it back
   from the installed distribution metadata. Its value is unchanged and
