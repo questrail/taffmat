@@ -18,6 +18,13 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Added
 
+- Dependabot keeps the pinned actions and the lock file moving. The
+  actions in both workflows are pinned to commit SHAs, so a fix
+  published upstream does not reach this repository the way it would
+  behind a moving tag; without something to move them, pinning would
+  amount to staying on one commit forever. It reads `pyproject.toml` and
+  `uv.lock` together as well, so a dependency update arrives as a lock
+  file change that CI checks with `uv sync --locked`.
 - Releases publish from a tag rather than from a laptop. `just release`
   refuses a dirty tree, a branch other than `master`, a `master` behind
   its upstream, an empty Unreleased section, or an existing tag; then
