@@ -329,7 +329,7 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
     """
     Write the TAFFmat .hdr file
     """
-    output_hdr_filename_root, output_hdr_filename_extension = os.path.splitext(
+    output_hdr_filename_root, _output_hdr_filename_extension = os.path.splitext(
         os.path.basename(output_hdr_filename)
     )
 

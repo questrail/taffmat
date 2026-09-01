@@ -46,10 +46,11 @@ include = [
 ]
 
 [tool.ruff]
-# Pin the rule set so that lint results don't drift with the installed ruff.
 line-length = 88
 
 [tool.ruff.lint]
+# Select rules explicitly rather than relying on ruff's defaults, so that the
+# rule set is a deliberate choice. The ruff version itself is pinned by uv.lock.
 select = [
   "E",   # pycodestyle errors
   "W",   # pycodestyle warnings
@@ -60,7 +61,15 @@ select = [
   "SIM", # flake8-simplify
   "EXE", # flake8-executable
   "PL",  # pylint
+  "PT",  # flake8-pytest-style
+  "RUF", # ruff's own rules
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# The suite is written against unittest.TestCase, so PT009 objects to every
+# assertion in it. Converting it to plain pytest asserts is worth doing and is
+# its own job, not a side effect of choosing a rule set.
+"tests/**" = ["PT009", "PT027"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

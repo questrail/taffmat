@@ -32,6 +32,14 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Changed
 
+- The ruff rule set gains `PT` and `RUF`, which applyaf and siganalysis
+  already select, and the reason for selecting a set explicitly is
+  written down where the set is. `RUF` found eight values unpacked from
+  a return and never used, now named with a leading underscore. `PT`
+  objects to every assertion in the suite, which is written against
+  `unittest.TestCase`; that is turned off for the tests rather than
+  answered, since converting the suite to plain pytest asserts is worth
+  doing on its own and not as a side effect of picking a rule set.
 - Type checking is done by [pyright][] rather than [ty][], which is still
   a 0.0.x release, matching applyaf and siganalysis. It runs inside
   `just lint` rather than as a separate `just check` that every caller

@@ -109,7 +109,9 @@ class TestInputFilenames(unittest.TestCase):
     def test_input_file_with_dat_extension(self):
         # Read in the TAFFmat file under test
         input_file_basename = os.path.join(self.test_taffmat_directory, "UTEST001.DAT")
-        data_array, time_vector, header_data = taffmat.read_taffmat(input_file_basename)
+        data_array, _time_vector, _header_data = taffmat.read_taffmat(
+            input_file_basename
+        )
         np.testing.assert_array_equal(
             data_array,
             self.known_data_array,
@@ -119,7 +121,9 @@ class TestInputFilenames(unittest.TestCase):
     def test_input_file_without_extension(self):
         # Read in the TAFFmat file under test
         input_file_basename = os.path.join(self.test_taffmat_directory, "UTEST001")
-        data_array, time_vector, header_data = taffmat.read_taffmat(input_file_basename)
+        data_array, _time_vector, _header_data = taffmat.read_taffmat(
+            input_file_basename
+        )
         np.testing.assert_array_equal(
             data_array,
             self.known_data_array,
@@ -258,10 +262,10 @@ class TestWritingTAFFmatFile(unittest.TestCase):
         return dat_filename, hdr_filename
 
     def test_writing_data_array(self):
-        source_dat, source_hdr = self._get_dat_hdr_filenames_from_base(
+        source_dat, _source_hdr = self._get_dat_hdr_filenames_from_base(
             self.input_base_filename
         )
-        output_dat, output_hdr = self._get_dat_hdr_filenames_from_base(
+        output_dat, _output_hdr = self._get_dat_hdr_filenames_from_base(
             self.output_base_filename
         )
         data_files_equal = filecmp.cmp(source_dat, output_dat, shallow=False)
@@ -270,10 +274,10 @@ class TestWritingTAFFmatFile(unittest.TestCase):
         )
 
     def test_writing_header_file_and_compare_with_original_taffmat(self):
-        source_dat, source_hdr = self._get_dat_hdr_filenames_from_base(
+        _source_dat, source_hdr = self._get_dat_hdr_filenames_from_base(
             self.input_base_filename
         )
-        output_dat, output_hdr = self._get_dat_hdr_filenames_from_base(
+        _output_dat, output_hdr = self._get_dat_hdr_filenames_from_base(
             self.output_base_filename
         )
         with open(source_hdr) as hdr_source_file:
@@ -291,7 +295,7 @@ class TestWritingTAFFmatFile(unittest.TestCase):
         taffmat.write_taffmat(
             self.data_array, self.header_data, new_output_base_filename
         )
-        data_array, time_vector, header_data = taffmat.read_taffmat(
+        _data_array, _time_vector, header_data = taffmat.read_taffmat(
             new_output_base_filename
         )
         self.assertEqual(header_data["dataset"], new_output_base_filename.upper())
@@ -348,7 +352,7 @@ class TestWritingTAFFmatFileSlice(unittest.TestCase):
         )
 
         # Read the TAFFmat data slice
-        slice_data_array, slice_time_vector, slice_header_data = taffmat.read_taffmat(
+        slice_data_array, _slice_time_vector, _slice_header_data = taffmat.read_taffmat(
             slice_output_base_filename
         )
 
