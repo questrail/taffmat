@@ -131,8 +131,8 @@ Tagged v1.0.2. Publish it with:
 ```
 
 The tag push runs the [release workflow][], which waits on the whole [CI
-workflow][ci link] before it does anything else: the 3.12 and 3.13 matrix
-and the dependency floor job. It then checks that the tagged commit is on
+workflow][ci link] before it does anything else: the 3.12, 3.13, and 3.14
+matrix and the dependency floor job. It then checks that the tagged commit is on
 `master`, since a tag is only a pointer and one placed anywhere else would
 otherwise publish whatever it points at, rechecks the tag against the
 version in `pyproject.toml`, and builds.

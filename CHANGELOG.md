@@ -18,6 +18,9 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Added
 
+- Python 3.14 to the classifiers and the CI matrix. The suite passes on
+  it, and nothing in the dependencies held it back; it was left out only
+  because the classifiers did not already name it.
 - `just up-all` and a `Justfile` that is otherwise line for line the one
   in [applyaf][] and [siganalysis][], so that moving between the
   questrail projects does not mean learning a second set of recipe
