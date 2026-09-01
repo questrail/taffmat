@@ -4,6 +4,8 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+## v2.0.0 - 2026-09-01
+
 ### Added
 
 - Python 3.14 to the classifiers and the CI matrix. The suite passes on

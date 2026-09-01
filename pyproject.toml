@@ -2,7 +2,7 @@
 
 [project]
 name = "taffmat"
-version = "1.0.1"
+version = "2.0.0"
 description = "Read and write Teac TAFFmat files"
 readme = "README.md"
 license = "MIT"
