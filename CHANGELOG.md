@@ -15,6 +15,12 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Changed
 
+- The version is written in `pyproject.toml` rather than in
+  `src/taffmat/__init__.py`, and `taffmat.__version__` now reads it back
+  from the installed distribution metadata. Its value is unchanged and
+  every caller keeps working. The version had to move for `uv version` to
+  be able to read or bump it, which is what the release recipe is built
+  on; uv refuses a project whose version is dynamic.
 - `.python-version` is tracked rather than ignored. It decides the
   interpreter a contributor's `uv sync` builds against, and the file was
   being read while being excluded from the repository.

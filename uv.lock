@@ -163,6 +163,7 @@ wheels = [
 
 [[package]]
 name = "taffmat"
+version = "1.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },

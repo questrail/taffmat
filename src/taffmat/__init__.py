@@ -47,11 +47,12 @@ level is approximately +/-120%." [Source p. 4-5 of Teac manual]
 import os
 from collections import OrderedDict
 from datetime import datetime
+from importlib.metadata import version
 
 # Data analysis related imports
 import numpy as np
 
-__version__ = "1.0.1"
+__version__ = version("taffmat")
 
 
 def _append_windows_newlines(input_list_of_strings: list[str]) -> list[str]:
