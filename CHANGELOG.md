@@ -15,6 +15,11 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Added
 
+- `scripts/smoke_test_wheel.py`, which installs the built wheel where
+  `src/` cannot be reached and checks the version, `__version__`, every
+  public function, and `py.typed`. Every other check runs against the
+  source tree, so this is the only one that can catch a packaging
+  mistake. `just build` runs it after building.
 - `just cov`, which runs the suite under coverage and writes both a
   terminal summary and `htmlcov/`, and the `pytest-cov` it needs. A
   floor of 86%, what the suite covers today, means uncovered code has to

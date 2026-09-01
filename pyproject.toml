@@ -93,7 +93,7 @@ fail_under = 86
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
-include = ["src", "tests"]
+include = ["src", "tests", "scripts"]
 [dependency-groups]
 dev = [
     "pyright>=1.1.411",
