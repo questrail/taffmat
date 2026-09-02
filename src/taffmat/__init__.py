@@ -68,11 +68,8 @@ def _append_windows_newlines(input_list_of_strings: list[str]) -> list[str]:
         N/A
     """
     windows_newline_character = "\r\n"
-    output_list_of_strings = []
-    for line in input_list_of_strings:
-        output_list_of_strings.append(line + windows_newline_character)
 
-    return output_list_of_strings
+    return [line + windows_newline_character for line in input_list_of_strings]
 
 
 def _apply_slope_and_offset(data_array, number_of_series, slope, y_offset):
@@ -81,7 +78,7 @@ def _apply_slope_and_offset(data_array, number_of_series, slope, y_offset):
     so the data_array contains the measured values.
     """
     data_array = data_array.astype(np.float64)
-    for series in range(0, number_of_series):
+    for series in range(number_of_series):
         data_array[series] = data_array[series] * slope[series] + y_offset[series]
 
     return data_array
@@ -94,14 +91,12 @@ def _remove_slope_and_offset(data_array, number_of_series, slope, y_offset):
     """
     # FIXME: There's no reason to pass the number_of_series into this function
     # since the data_array's first dimension tells how many series there are.
-    for series in range(0, number_of_series):
+    for series in range(number_of_series):
         data_array[series] = np.around(
             (data_array[series] - y_offset[series]) / slope[series]
         )
 
-    data_array = data_array.astype("int16")
-
-    return data_array
+    return data_array.astype("int16")
 
 
 def _format_exponent_notation(input_number, precision, num_exponent_digits):
@@ -317,9 +312,7 @@ def _read_taffmat_dat(input_dat_file, file_type, number_of_series, slope, y_offs
     with open(input_dat_file, "rb") as datfile:
         data_array = np.fromfile(datfile, data_size).reshape((-1, number_of_series)).T
 
-    data_array = _apply_slope_and_offset(data_array, number_of_series, slope, y_offset)
-
-    return data_array
+    return _apply_slope_and_offset(data_array, number_of_series, slope, y_offset)
 
 
 def _write_taffmat_hdr(header_data, output_hdr_filename):
