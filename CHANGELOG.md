@@ -4,6 +4,8 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+## v3.0.0 - 2026-09-15
+
 ### Fixed
 
 - `write_taffmat_slice` no longer modifies the `header_data` it is given. It
