@@ -4,6 +4,19 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+### Fixed
+
+- `write_taffmat_slice` no longer modifies the `header_data` it is given. It
+  aliased the caller's dictionary rather than copying it and then wrote the
+  slice's description into it, so a caller that read a file, wrote a slice out
+  of it, and went on using the header was silently handed the slice's numbers:
+  `number_of_samples` became the length of the slice rather than of the
+  recording, `voice_memo_on` became `False`, and `dataset` was renamed. The
+  written .hdr file is unchanged; only the caller's copy is now left alone.
+  The `dataset` assignment is dropped rather than moved onto the copy: the
+  .hdr writer has always taken the `DATASET` line from the output filename it
+  was handed, so setting the key did nothing but damage the caller's header.
+
 ### Added
 
 - Ignore `.pypirc`. A copy holding a PyPI username and password predates the

@@ -537,9 +537,11 @@ def write_taffmat_slice(
     Write the TAFFmat .dat and .hdr given the starting and ending
     data points to include in the .dat file.
 
-    The only change to the .hdr file from the given header_data
-    dictionary is that the number of samples will be recalculated
-    based on the starting and ending data points to be written.
+    The .hdr file written describes the slice rather than the recording it
+    came from: the number of samples is recalculated from the starting and
+    ending data points, and the voice memo is dropped because it no longer
+    matches the length of the data. Neither the given data_array nor the
+    given header_data is modified.
     """
 
     # TODO(mdr): Add a check to determine if the data_array is beyond
@@ -550,9 +552,13 @@ def write_taffmat_slice(
     # by the LX-10 when storing data as integers.
     data_array_copy = data_array.copy()
 
-    # Create copies of the originals
+    # Create copies of the originals. The header is copied rather than
+    # aliased so that describing the slice does not overwrite the caller's
+    # description of the recording; a caller that reads a file, writes a
+    # slice out of it, and then asks the header how long the recording was
+    # would otherwise be handed the length of the slice.
     sliced_data_array = data_array_copy[:, starting_data_index : ending_data_index + 1]
-    sliced_header_data = header_data
+    sliced_header_data = header_data.copy()
 
     # Calculate number of samples
     new_number_of_samples = ending_data_index + 1 - starting_data_index
@@ -564,9 +570,6 @@ def write_taffmat_slice(
     # same length, so just disable the voice memo (i.e., remove
     # VOICE_MEMO line from .HDR file)
     sliced_header_data["voice_memo_on"] = False
-
-    # Rename the DATASET to the new filename
-    sliced_header_data["dataset"] = os.path.basename(output_base_filename).upper()
 
     # Write the sliced TAFFmat data
     write_taffmat(sliced_data_array, sliced_header_data, output_base_filename)

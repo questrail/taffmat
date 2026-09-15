@@ -1,6 +1,7 @@
 # Try to future proof code so that it's Python 3.x ready
 
 # Imports from the Python Standard Library
+import copy
 import filecmp
 import os
 import unittest
@@ -367,6 +368,168 @@ class TestWritingTAFFmatFileSlice(unittest.TestCase):
             slice_data_array,
             original_data_array,
             "The sliced data array does not equal the original data array.",
+        )
+
+    def test_writing_a_slice_leaves_the_given_header_alone(self):
+        """
+        The header describes the recording the slice was cut from, and the
+        caller keeps using it after the slice is written. Describing the
+        slice must not overwrite it, or a caller asking how long the
+        recording was gets the length of the slice back instead.
+        """
+
+        slice_output_base_filename = os.path.join(
+            self.test_taffmat_directory, "test_slice_output_taffmat"
+        )
+        header_before = copy.deepcopy(self.header_data)
+
+        taffmat.write_taffmat_slice(
+            self.data_array, self.header_data, slice_output_base_filename, 0, 999
+        )
+
+        self.assertEqual(
+            self.header_data["number_of_samples"],
+            header_before["number_of_samples"],
+            "Writing a slice changed the recording's sample count.",
+        )
+        self.assertEqual(
+            self.header_data["voice_memo_on"],
+            header_before["voice_memo_on"],
+            "Writing a slice turned off the recording's voice memo.",
+        )
+        self.assertEqual(
+            self.header_data["dataset"],
+            header_before["dataset"],
+            "Writing a slice renamed the recording's dataset.",
+        )
+
+    def test_writing_a_slice_leaves_the_given_data_array_alone(self):
+        slice_output_base_filename = os.path.join(
+            self.test_taffmat_directory, "test_slice_output_taffmat"
+        )
+        data_array_before = np.copy(self.data_array)
+
+        taffmat.write_taffmat_slice(
+            self.data_array, self.header_data, slice_output_base_filename, 0, 999
+        )
+
+        np.testing.assert_array_equal(
+            self.data_array,
+            data_array_before,
+            "Writing a slice changed the data array it was given.",
+        )
+
+    def test_the_slice_header_describes_the_slice(self):
+        """
+        The copy taken to protect the caller still has to carry the sample
+        count and the dropped voice memo through to the .hdr file.
+        """
+
+        slice_output_base_filename = os.path.join(
+            self.test_taffmat_directory, "test_slice_output_taffmat"
+        )
+        number_of_samples_in_slice = 1000
+
+        taffmat.write_taffmat_slice(
+            self.data_array,
+            self.header_data,
+            slice_output_base_filename,
+            0,
+            number_of_samples_in_slice - 1,
+        )
+
+        _data_array, _time_vector, slice_header_data = taffmat.read_taffmat(
+            slice_output_base_filename
+        )
+
+        self.assertEqual(
+            slice_header_data["number_of_samples"], number_of_samples_in_slice
+        )
+        self.assertFalse(slice_header_data["voice_memo_on"])
+        # The DATASET line is written from the output filename rather than
+        # from the header, so the slice is named after the file it lands in
+        # without the caller's header having to be renamed to say so.
+        self.assertEqual(
+            slice_header_data["dataset"],
+            os.path.basename(slice_output_base_filename).upper(),
+        )
+
+
+class TestVoiceMemoRecording(unittest.TestCase):
+    """
+    UTEST001 was recorded without a voice memo, so reading and writing the
+    VOICE_MEMO line went unexercised, as did dropping it when writing a
+    slice. Build a recording that claims one by writing it out.
+    """
+
+    def setUp(self):
+        self.test_taffmat_directory = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "test_taffmat_files"
+        )
+        self.written_base_filenames = []
+
+        input_base_filename = os.path.join(self.test_taffmat_directory, "UTEST001")
+        self.data_array, _time_vector, header_data = taffmat.read_taffmat(
+            input_base_filename
+        )
+
+        header_data["voice_memo_on"] = True
+        header_data["voice_memo_bits_per_sample"] = "8"
+        header_data["voice_memo_size_bytes"] = 1234
+        self.header_data = header_data
+
+    def tearDown(self):
+        for base_filename in self.written_base_filenames:
+            for extension in (".DAT", ".HDR"):
+                try:
+                    os.remove(base_filename + extension)
+                except OSError as error:
+                    print(error)
+                    print(f"Couldn't remove {base_filename}{extension}.")
+
+    def _output_base_filename(self, name):
+        base_filename = os.path.join(self.test_taffmat_directory, name)
+        self.written_base_filenames.append(base_filename)
+        return base_filename
+
+    def test_a_voice_memo_survives_a_write_and_read(self):
+        base_filename = self._output_base_filename("test_voice_memo_taffmat")
+
+        taffmat.write_taffmat(self.data_array, self.header_data, base_filename)
+        _data_array, _time_vector, header_data = taffmat.read_taffmat(base_filename)
+
+        self.assertTrue(header_data["voice_memo_on"])
+        self.assertEqual(
+            header_data["voice_memo_bits_per_sample"],
+            self.header_data["voice_memo_bits_per_sample"],
+        )
+        self.assertEqual(
+            header_data["voice_memo_size_bytes"],
+            self.header_data["voice_memo_size_bytes"],
+        )
+
+    def test_a_slice_drops_the_voice_memo_without_disowning_the_original(self):
+        """
+        The memo no longer matches the length of the data, so the slice is
+        written without it; the recording it was cut from still has one.
+        """
+
+        recording = self._output_base_filename("test_voice_memo_taffmat")
+        taffmat.write_taffmat(self.data_array, self.header_data, recording)
+        data_array, _time_vector, header_data = taffmat.read_taffmat(recording)
+
+        slice_base_filename = self._output_base_filename("test_voice_memo_slice")
+        taffmat.write_taffmat_slice(
+            data_array, header_data, slice_base_filename, 0, 999
+        )
+
+        _slice_data, _slice_time, slice_header = taffmat.read_taffmat(
+            slice_base_filename
+        )
+        self.assertFalse(slice_header["voice_memo_on"])
+        self.assertTrue(
+            header_data["voice_memo_on"],
+            "Writing a slice turned off the recording's voice memo.",
         )
 
 
