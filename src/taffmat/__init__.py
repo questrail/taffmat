@@ -496,12 +496,16 @@ def read_taffmat(input_file):
         header_data["y_offset"],
     )
 
-    # Create the time vector
-    time_vector = np.linspace(
-        0,
-        (header_data["number_of_samples"] / header_data["sampling_frequency_hz"]),
-        header_data["number_of_samples"],
-    )
+    # Create the time vector. Sample n was taken at n / sampling_frequency_hz,
+    # so the last of N samples falls at (N - 1) / sampling_frequency_hz rather
+    # than at N / sampling_frequency_hz. Spreading N points over the latter, as
+    # this did while it used linspace, stretched the step to
+    # (N / fs) / (N - 1) and put every sample progressively late, a full sample
+    # by the end of the recording. The error is under one sample throughout, so
+    # it moved no conclusion, but it left this vector disagreeing with the
+    # times a caller works out from a sample index and the sampling frequency.
+    sampling_frequency_hz = header_data["sampling_frequency_hz"]
+    time_vector = np.arange(header_data["number_of_samples"]) / sampling_frequency_hz
 
     # Return a tuple
     return (data_array, time_vector, header_data)

@@ -4,6 +4,19 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+### Fixed
+
+- `read_taffmat` puts sample n of the returned `time_vector` at
+  `n / sampling_frequency_hz`. It spread the samples over
+  `number_of_samples / sampling_frequency_hz` with `np.linspace`, which
+  stretched every step by `N / (N - 1)` and placed each sample progressively
+  late --- a full sample by the end of the recording. The error stayed under
+  one sample throughout, so it moved no measurement, but it left the vector
+  disagreeing with the times a caller works out from a sample index and the
+  sampling frequency, which is how a caller that plots a waveform against
+  `time_vector` and marks it up from sample indices ends up with the two
+  slightly out of step.
+
 ## v3.0.0 - 2026-09-15
 
 ### Fixed

@@ -192,6 +192,46 @@ class TestReadingTAFFmatFile(unittest.TestCase):
             "Incorrect number of samples in time_vector",
         )
 
+    def test_time_vector_starts_at_zero(self):
+        self.assertEqual(
+            self.time_vector[0], 0, "time_vector should start at the first sample"
+        )
+
+    def test_time_vector_steps_by_one_sampling_period(self):
+        # Sample n was taken at n / sampling_frequency_hz, so every step is one
+        # sampling period. Spreading the samples over number_of_samples / fs
+        # instead stretched every step by a factor of N / (N - 1).
+        sampling_period_sec = 1 / self.known_header["sampling_frequency_hz"]
+        np.testing.assert_allclose(
+            np.diff(self.time_vector),
+            sampling_period_sec,
+            err_msg="time_vector should step by one sampling period",
+        )
+
+    def test_time_vector_ends_one_sample_short_of_the_duration(self):
+        # The last of N samples was taken at (N - 1) / fs; the recording runs
+        # one sampling period past it. Putting that sample at N / fs left every
+        # sample progressively late, by a full sample at the end of the
+        # recording.
+        num_samples = self.header_data["number_of_samples"]
+        sampling_period_sec = 1 / self.known_header["sampling_frequency_hz"]
+        self.assertAlmostEqual(
+            self.time_vector[-1],
+            (num_samples - 1) * sampling_period_sec,
+            msg="time_vector should end one sampling period short of the duration",
+        )
+
+    def test_time_vector_agrees_with_times_taken_from_a_sample_index(self):
+        # A caller that works a time out from a sample index and the sampling
+        # frequency has to land on the same instant this vector reports.
+        sampling_frequency_hz = self.known_header["sampling_frequency_hz"]
+        for index in (0, 1, 1000, self.header_data["number_of_samples"] - 1):
+            self.assertAlmostEqual(
+                self.time_vector[index],
+                index / sampling_frequency_hz,
+                msg=f"time_vector disagrees at sample {index}",
+            )
+
     def test_number_of_series(self):
         self.assertEqual(
             self.header_data["number_of_series"],
