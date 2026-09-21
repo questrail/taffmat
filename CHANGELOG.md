@@ -4,6 +4,8 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+## v3.0.1 - 2026-09-21
+
 ### Fixed
 
 - `read_taffmat` puts sample n of the returned `time_vector` at
