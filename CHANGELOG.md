@@ -49,6 +49,16 @@ This file contains all notable changes to the [taffmat][] project.
   `cov` take stays unquoted, since quoting it would collapse several arguments
   into one.
 
+### Changed
+
+- The tests write their TAFFmat output into a temporary directory of their
+  own. The slice tests wrote into `tests/test_taffmat_files`, rewriting two
+  tracked files there on every run, and one test wrote into whatever
+  directory pytest was started from. Those two files,
+  `test_slice_output_taffmat.dat` and `.hdr`, were output rather than
+  fixtures, read by nothing but the run that had just written them, and are
+  removed.
+
 ## v3.0.1 - 2026-09-21
 
 ### Fixed

@@ -13,6 +13,18 @@ import numpy as np
 import taffmat
 
 
+def _output_directory(test_case):
+    """
+    A directory of test_case's own to write into, removed when the test ends.
+    Writing into test_taffmat_files instead rewrote files tracked alongside
+    the fixtures on every run, and a test that failed before its tearDown
+    left output there to be committed.
+    """
+    output_directory = tempfile.TemporaryDirectory()
+    test_case.addCleanup(output_directory.cleanup)
+    return output_directory.name
+
+
 class TestPrintingExponentNotation(unittest.TestCase):
     def test_printing_exponent_notation(self):
         numbers_to_test = (0.00002, 0.00004, 0.00008, 0.0002, 0.0004, 0.0008, 0.002)
@@ -273,30 +285,15 @@ class TestWritingTAFFmatFile(unittest.TestCase):
         )
 
         # Setup the output_basefilename
+        self.output_directory = _output_directory(self)
         self.output_base_filename = os.path.join(
-            self.test_taffmat_directory, "test_output_taffmat"
+            self.output_directory, "test_output_taffmat"
         )
 
         # Write the .dat and .hdr files using taffmat.py
         taffmat.write_taffmat(
             self.data_array, self.header_data, self.output_base_filename
         )
-
-    def tearDown(self):
-        # Need to delete the test output file
-        output_dat_filename = f"{self.output_base_filename}.DAT"
-        output_hdr_filename = f"{self.output_base_filename}.HDR"
-        try:
-            os.remove(output_dat_filename)
-        except OSError as error:
-            print(error)
-            print("Couldn't remove the test dat file.")
-
-        try:
-            os.remove(output_hdr_filename)
-        except OSError as error:
-            print(error)
-            print("Couldn't remove the test hdr file.")
 
     def _get_dat_hdr_filenames_from_base(self, base_filename):
         dat_filename = f"{base_filename}.DAT"
@@ -336,28 +333,16 @@ class TestWritingTAFFmatFile(unittest.TestCase):
         )
 
     def test_writing_different_dataset_filename(self):
-        new_output_base_filename = "something_different"
+        new_output_base_filename = os.path.join(
+            self.output_directory, "something_different"
+        )
         taffmat.write_taffmat(
             self.data_array, self.header_data, new_output_base_filename
         )
         _data_array, _time_vector, header_data = taffmat.read_taffmat(
             new_output_base_filename
         )
-        self.assertEqual(header_data["dataset"], new_output_base_filename.upper())
-        new_output_dat, new_output_hdr = self._get_dat_hdr_filenames_from_base(
-            new_output_base_filename
-        )
-        try:
-            os.remove(new_output_dat)
-        except OSError as error:
-            print(error)
-            print("Couldn't remove the test dat file.")
-
-        try:
-            os.remove(new_output_hdr)
-        except OSError as error:
-            print(error)
-            print("Couldn't remove the test hdr file.")
+        self.assertEqual(header_data["dataset"], "SOMETHING_DIFFERENT")
 
 
 class TestWritingTAFFmatFileSlice(unittest.TestCase):
@@ -371,6 +356,9 @@ class TestWritingTAFFmatFileSlice(unittest.TestCase):
         self.data_array, self.time_vector, self.header_data = taffmat.read_taffmat(
             self.input_base_filename
         )
+        self.slice_output_base_filename = os.path.join(
+            _output_directory(self), "test_slice_output_taffmat"
+        )
 
     def test_writing_dat_file_slice(self):
         """
@@ -378,10 +366,6 @@ class TestWritingTAFFmatFileSlice(unittest.TestCase):
         file.  Then read the new .dat file and make sure it matches the first
         1000 elements of the original data_array
         """
-
-        slice_output_base_filename = os.path.join(
-            self.test_taffmat_directory, "test_slice_output_taffmat"
-        )
 
         # number_of_samples_in_slice = self.data_array.shape[1]
         number_of_samples_in_slice = 1000
@@ -391,14 +375,14 @@ class TestWritingTAFFmatFileSlice(unittest.TestCase):
         taffmat.write_taffmat_slice(
             self.data_array,
             self.header_data,
-            slice_output_base_filename,
+            self.slice_output_base_filename,
             0,
             number_of_samples_in_slice - 1,
         )
 
         # Read the TAFFmat data slice
         slice_data_array, _slice_time_vector, _slice_header_data = taffmat.read_taffmat(
-            slice_output_base_filename
+            self.slice_output_base_filename
         )
 
         # Confirm the proper number of samples exist
@@ -422,13 +406,10 @@ class TestWritingTAFFmatFileSlice(unittest.TestCase):
         recording was gets the length of the slice back instead.
         """
 
-        slice_output_base_filename = os.path.join(
-            self.test_taffmat_directory, "test_slice_output_taffmat"
-        )
         header_before = copy.deepcopy(self.header_data)
 
         taffmat.write_taffmat_slice(
-            self.data_array, self.header_data, slice_output_base_filename, 0, 999
+            self.data_array, self.header_data, self.slice_output_base_filename, 0, 999
         )
 
         self.assertEqual(
@@ -448,13 +429,10 @@ class TestWritingTAFFmatFileSlice(unittest.TestCase):
         )
 
     def test_writing_a_slice_leaves_the_given_data_array_alone(self):
-        slice_output_base_filename = os.path.join(
-            self.test_taffmat_directory, "test_slice_output_taffmat"
-        )
         data_array_before = np.copy(self.data_array)
 
         taffmat.write_taffmat_slice(
-            self.data_array, self.header_data, slice_output_base_filename, 0, 999
+            self.data_array, self.header_data, self.slice_output_base_filename, 0, 999
         )
 
         np.testing.assert_array_equal(
@@ -469,21 +447,18 @@ class TestWritingTAFFmatFileSlice(unittest.TestCase):
         count and the dropped voice memo through to the .hdr file.
         """
 
-        slice_output_base_filename = os.path.join(
-            self.test_taffmat_directory, "test_slice_output_taffmat"
-        )
         number_of_samples_in_slice = 1000
 
         taffmat.write_taffmat_slice(
             self.data_array,
             self.header_data,
-            slice_output_base_filename,
+            self.slice_output_base_filename,
             0,
             number_of_samples_in_slice - 1,
         )
 
         _data_array, _time_vector, slice_header_data = taffmat.read_taffmat(
-            slice_output_base_filename
+            self.slice_output_base_filename
         )
 
         self.assertEqual(
@@ -495,7 +470,7 @@ class TestWritingTAFFmatFileSlice(unittest.TestCase):
         # without the caller's header having to be renamed to say so.
         self.assertEqual(
             slice_header_data["dataset"],
-            os.path.basename(slice_output_base_filename).upper(),
+            os.path.basename(self.slice_output_base_filename).upper(),
         )
 
 
@@ -510,7 +485,7 @@ class TestVoiceMemoRecording(unittest.TestCase):
         self.test_taffmat_directory = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "test_taffmat_files"
         )
-        self.written_base_filenames = []
+        self.output_directory = _output_directory(self)
 
         input_base_filename = os.path.join(self.test_taffmat_directory, "UTEST001")
         self.data_array, _time_vector, header_data = taffmat.read_taffmat(
@@ -522,19 +497,8 @@ class TestVoiceMemoRecording(unittest.TestCase):
         header_data["voice_memo_size_bytes"] = 1234
         self.header_data = header_data
 
-    def tearDown(self):
-        for base_filename in self.written_base_filenames:
-            for extension in (".DAT", ".HDR"):
-                try:
-                    os.remove(base_filename + extension)
-                except OSError as error:
-                    print(error)
-                    print(f"Couldn't remove {base_filename}{extension}.")
-
     def _output_base_filename(self, name):
-        base_filename = os.path.join(self.test_taffmat_directory, name)
-        self.written_base_filenames.append(base_filename)
-        return base_filename
+        return os.path.join(self.output_directory, name)
 
     def test_a_voice_memo_survives_a_write_and_read(self):
         base_filename = self._output_base_filename("test_voice_memo_taffmat")
@@ -590,9 +554,7 @@ class TestWritingLeavesTheDataFaithful(unittest.TestCase):
         self.data_array, _time_vector, self.header_data = taffmat.read_taffmat(
             os.path.join(test_taffmat_directory, "UTEST001")
         )
-        output_directory = tempfile.TemporaryDirectory()
-        self.addCleanup(output_directory.cleanup)
-        self.output_base_filename = os.path.join(output_directory.name, "OUTPUT")
+        self.output_base_filename = os.path.join(_output_directory(self), "OUTPUT")
 
     def test_writing_leaves_the_given_data_array_alone(self):
         """
