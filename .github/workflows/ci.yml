@@ -32,8 +32,11 @@ env:
 
 jobs:
   test:
-    name: Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    # The Windows leg is named apart from the Linux ones rather than all of
+    # them gaining an OS suffix, which would rename the checks a branch
+    # protection rule may already require.
+    name: Python ${{ matrix.python-version }}${{ matrix.os == 'windows-latest' && ' on Windows' || '' }}
+    runs-on: ${{ matrix.os }}
     # These jobs finish in well under a minute; the GitHub default is six
     # hours. Actions is free on a public repository using standard runners, so
     # a hang costs nothing to run. What it costs is a release. release.yml
@@ -48,6 +51,15 @@ jobs:
         # The versions the pyproject.toml classifiers claim. A version added
         # here belongs there too, and the other way round.
         python-version: ["3.12", "3.13", "3.14"]
+        os: [ubuntu-latest]
+        # The .hdr file is written with \r\n line endings whatever the
+        # platform, and text mode on Windows translates a \n that a Linux
+        # runner leaves alone, so only a Windows run can catch the header
+        # being written with \r\r\n. One interpreter is enough to cover a
+        # difference in the platform rather than in Python.
+        include:
+          - python-version: "3.13"
+            os: windows-latest
 
     steps:
       - name: Check out the repository
@@ -83,9 +95,12 @@ jobs:
 
       # Skipped when the release workflow calls this one: github.ref is the
       # caller's, so a tag run would re-report the coverage the same commit
-      # already reported when it landed on master.
+      # already reported when it landed on master. Reported from the Linux
+      # leg only, since the Windows leg runs 3.13 too and would report twice.
       - name: Report coverage to Coveralls
-        if: matrix.python-version == '3.13' && !startsWith(github.ref, 'refs/tags/')
+        if: >-
+          matrix.python-version == '3.13' && matrix.os == 'ubuntu-latest'
+          && !startsWith(github.ref, 'refs/tags/')
         uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
         with:
           file: coverage.lcov

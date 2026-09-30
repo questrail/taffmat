@@ -322,9 +322,12 @@ class TestWritingTAFFmatFile(unittest.TestCase):
         _output_dat, output_hdr = self._get_dat_hdr_filenames_from_base(
             self.output_base_filename
         )
-        with open(source_hdr) as hdr_source_file:
+        # newline="" keeps the \r\n the split relies on. Without it Windows
+        # reads each line ending as \n, leaving one element per file and
+        # nothing after [1:] to compare.
+        with open(source_hdr, newline="") as hdr_source_file:
             source_hdr_contents = hdr_source_file.read().split("\r\n")
-        with open(output_hdr) as hdr_output_file:
+        with open(output_hdr, newline="") as hdr_output_file:
             output_hdr_contents = hdr_output_file.read().split("\r\n")
         source_hdr_contents_no_whitespace = [s.strip() for s in source_hdr_contents]
         output_hdr_contents_no_whitespace = [s.strip() for s in output_hdr_contents]

@@ -1,0 +1,4 @@
+# The fixtures are compared byte for byte against what taffmat writes. A
+# Windows checkout with core.autocrlf would otherwise be free to rewrite the
+# line endings of the .hdr files, and to guess wrong about the binary ones.
+tests/test_taffmat_files/** -text

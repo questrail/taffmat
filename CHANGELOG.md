@@ -34,7 +34,11 @@ This file contains all notable changes to the [taffmat][] project.
   rather than in the byte order of the machine running taffmat.
 - The .hdr file is written with a single `\r\n` ending each line on Windows.
   The lines already carried `\r\n` and text mode translated the `\n` again,
-  ending every line in `\r\r\n`.
+  ending every line in `\r\r\n`. CI now runs the suite on Windows as well, so
+  that this is tested somewhere it can fail.
+- The header comparison test opens both files with `newline=""`. It split
+  them on `\r\n`, which Windows text mode had already turned into `\n`,
+  leaving nothing to compare and a test that could not fail there.
 - `just add`, `just dev`, `just up`, and `just doc` quote the argument they
   are given. just interpolates an argument straight into the shell line, so
   `just add 'siganalysis>=0.10.0'` ran `uv add siganalysis>=0.10.0`: the `>`
