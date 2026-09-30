@@ -4,6 +4,14 @@ This file contains all notable changes to the [taffmat][] project.
 
 ## Unreleased
 
+### Added
+
+- `__all__` names the public API: `read_taffmat`, `write_taffmat`,
+  `write_taffmat_slice`, and `change_slope`. `from taffmat import *` no longer
+  also pulls in the modules taffmat itself imports (`os`, `np`, `OrderedDict`,
+  and `datetime`), and type checkers and editors now see those four names as
+  the whole of the package's surface.
+
 ### Fixed
 
 - `just add`, `just dev`, `just up`, and `just doc` quote the argument they

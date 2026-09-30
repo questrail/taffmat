@@ -51,6 +51,13 @@ from datetime import datetime
 # Data analysis related imports
 import numpy as np
 
+__all__ = [
+    "change_slope",
+    "read_taffmat",
+    "write_taffmat",
+    "write_taffmat_slice",
+]
+
 
 def _append_windows_newlines(input_list_of_strings: list[str]) -> list[str]:
     """Append Windows style newlines to list of strings.
@@ -319,7 +326,7 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
     """
     Write the TAFFmat .hdr file
     """
-    output_hdr_filename_root, _output_hdr_filename_extension = os.path.splitext(
+    output_hdr_filename_root, _ = os.path.splitext(
         os.path.basename(output_hdr_filename)
     )
 
