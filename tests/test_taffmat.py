@@ -4,6 +4,7 @@
 import copy
 import filecmp
 import os
+import tempfile
 import unittest
 
 # Other imports
@@ -571,6 +572,138 @@ class TestVoiceMemoRecording(unittest.TestCase):
             header_data["voice_memo_on"],
             "Writing a slice turned off the recording's voice memo.",
         )
+
+
+class TestWritingLeavesTheDataFaithful(unittest.TestCase):
+    """
+    What write_taffmat puts on disk, and what it leaves in the caller's hands,
+    has to be the recording it was given.
+    """
+
+    def setUp(self):
+        test_taffmat_directory = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "test_taffmat_files"
+        )
+        self.data_array, _time_vector, self.header_data = taffmat.read_taffmat(
+            os.path.join(test_taffmat_directory, "UTEST001")
+        )
+        output_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(output_directory.cleanup)
+        self.output_base_filename = os.path.join(output_directory.name, "OUTPUT")
+
+    def test_writing_leaves_the_given_data_array_alone(self):
+        """
+        The caller's array held measured values and has to keep holding them.
+        Converting it to ADC codes in place handed a caller that went on
+        analysing, or wrote it a second time, integers such as 2959.0 where
+        0.23672 V had been.
+        """
+        data_array_before = np.copy(self.data_array)
+
+        taffmat.write_taffmat(
+            self.data_array, self.header_data, self.output_base_filename
+        )
+
+        np.testing.assert_array_equal(
+            self.data_array,
+            data_array_before,
+            "Writing changed the data array it was given.",
+        )
+
+    def test_writing_the_same_data_twice_writes_the_same_file(self):
+        first_base_filename = self.output_base_filename + "_FIRST"
+        taffmat.write_taffmat(self.data_array, self.header_data, first_base_filename)
+        taffmat.write_taffmat(
+            self.data_array, self.header_data, self.output_base_filename
+        )
+
+        self.assertTrue(
+            filecmp.cmp(
+                f"{first_base_filename}.DAT",
+                f"{self.output_base_filename}.DAT",
+                shallow=False,
+            ),
+            "A second write of the same data wrote a different .dat file.",
+        )
+
+    def test_a_value_beyond_the_adc_range_is_refused_rather_than_wrapped(self):
+        """
+        Doubling channel 1 pushes its peak past +32,767 codes. Cast straight
+        to int16 it wrapped around, and 2.82 V was read back as -2.42 V.
+        """
+        doubled = taffmat.change_slope(np.copy(self.data_array), 0, 2)
+
+        with self.assertRaisesRegex(ValueError, "series 0"):
+            taffmat.write_taffmat(doubled, self.header_data, self.output_base_filename)
+
+    def test_a_value_that_is_not_finite_is_refused(self):
+        self.data_array[1, 10] = np.nan
+
+        with self.assertRaisesRegex(ValueError, "series 1, sample 10"):
+            taffmat.write_taffmat(
+                self.data_array, self.header_data, self.output_base_filename
+            )
+
+    def test_refusing_the_data_leaves_no_files_behind(self):
+        """
+        A .hdr written ahead of a .dat that could not be would look to the
+        next reader like a recording with its data missing.
+        """
+        doubled = taffmat.change_slope(np.copy(self.data_array), 0, 2)
+
+        with self.assertRaises(ValueError):
+            taffmat.write_taffmat(doubled, self.header_data, self.output_base_filename)
+
+        self.assertFalse(os.path.exists(f"{self.output_base_filename}.HDR"))
+        self.assertFalse(os.path.exists(f"{self.output_base_filename}.DAT"))
+
+    def test_a_long_file_survives_a_write_and_read(self):
+        """
+        A LONG header promises 4-byte samples. Writing int16 regardless read
+        back as half as many samples, each built from two of the originals.
+        """
+        self.header_data["file_type"] = "LONG"
+
+        taffmat.write_taffmat(
+            self.data_array, self.header_data, self.output_base_filename
+        )
+        data_array, _time_vector, header_data = taffmat.read_taffmat(
+            self.output_base_filename
+        )
+
+        self.assertEqual(
+            os.path.getsize(f"{self.output_base_filename}.DAT"),
+            header_data["number_of_samples"] * header_data["number_of_series"] * 4,
+        )
+        np.testing.assert_array_equal(data_array, self.data_array)
+
+    def test_a_long_file_holds_codes_beyond_the_int16_range(self):
+        self.header_data["file_type"] = "LONG"
+        doubled = taffmat.change_slope(np.copy(self.data_array), 0, 2)
+
+        taffmat.write_taffmat(doubled, self.header_data, self.output_base_filename)
+        data_array, _time_vector, _header_data = taffmat.read_taffmat(
+            self.output_base_filename
+        )
+
+        np.testing.assert_allclose(data_array, doubled)
+
+    def test_header_lines_end_in_a_single_crlf(self):
+        """
+        The writer ends each line in \\r\\n itself. In text mode Windows
+        translated the \\n again, ending every line in \\r\\r\\n.
+        """
+        taffmat.write_taffmat(
+            self.data_array, self.header_data, self.output_base_filename
+        )
+
+        with open(f"{self.output_base_filename}.HDR", "rb") as hdr_file:
+            raw_header = hdr_file.read()
+
+        self.assertTrue(raw_header.endswith(b"\r\n"))
+        for line in raw_header.split(b"\r\n"):
+            self.assertNotIn(b"\r", line, "A header line has a stray \\r.")
+            self.assertNotIn(b"\n", line, "A header line has a bare \\n.")
 
 
 if __name__ == "__main__":

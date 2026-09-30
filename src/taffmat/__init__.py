@@ -12,7 +12,7 @@ is recored as 2-byte integers from -32,768 to +32,767. Negative
 numbers are expressed as 2's complements. The byte order is from
 the lower bytes to the higher bytes.
 
-The max ADC values are +/-25,000, which represents +/-100% of
+In 16 bit mode, the max ADC values are +/-25,000, which represents +/-100% of
 the input range (i.e., slope = range / 25000):
 
      0.5V = 2e-5
@@ -22,6 +22,8 @@ the input range (i.e., slope = range / 25000):
       10V = 4e-4
       20V = 8e-4
       50V = 2e-3
+
+In 32 bit mode, 1,638,400,000 is 100% range value.
 
 # Notes on the header file format #
 
@@ -50,6 +52,7 @@ from datetime import datetime
 
 # Data analysis related imports
 import numpy as np
+import numpy.typing as npt
 
 __all__ = [
     "change_slope",
@@ -91,19 +94,56 @@ def _apply_slope_and_offset(data_array, number_of_series, slope, y_offset):
     return data_array
 
 
-def _remove_slope_and_offset(data_array, number_of_series, slope, y_offset):
+def _dat_dtype(file_type):
     """
-    Convert data_array from float64 to int16 by removing the slope and offset
-    in preparation to writing the TAFFmat .dat file
+    The numpy dtype a .dat file of the given FILE_TYPE stores each sample as:
+    INTEGER (16 bit A/D) as 2-byte integers and LONG (24 bit A/D) as 4-byte
+    integers, both in little-endian byte order. An unrecognized FILE_TYPE is
+    taken as INTEGER.
+    """
+    if file_type == "LONG":
+        return np.dtype("<i4")
+    return np.dtype("<i2")
+
+
+def _remove_slope_and_offset(
+    data_array, number_of_series, slope, y_offset, dtype: npt.DTypeLike = "<i2"
+):
+    """
+    Convert data_array from measured values to the ADC codes stored in the
+    TAFFmat .dat file by removing the slope and offset.
+
+    The conversion is made into a new array, so the given data_array is left
+    holding the measured values. A value whose code does not fit in dtype, or
+    that is not finite, raises ValueError rather than being cast: numpy would
+    otherwise wrap it silently, and a reading just past the positive end of
+    the range would come back as one near the negative end.
     """
     # FIXME: There's no reason to pass the number_of_series into this function
     # since the data_array's first dimension tells how many series there are.
+    adc_codes = np.empty(np.shape(data_array), dtype=np.float64)
     for series in range(number_of_series):
-        data_array[series] = np.around(
+        adc_codes[series] = np.around(
             (data_array[series] - y_offset[series]) / slope[series]
         )
 
-    return data_array.astype("int16")
+    dtype = np.dtype(dtype)
+    limits = np.iinfo(dtype)
+    unstorable = ~np.isfinite(adc_codes) | (adc_codes < limits.min)
+    unstorable |= adc_codes > limits.max
+    if unstorable.any():
+        series, sample = np.argwhere(unstorable)[0]
+        raise ValueError(
+            f"{np.count_nonzero(unstorable)} value(s) cannot be stored as "
+            f"{dtype.name} ADC codes (range {limits.min} to {limits.max}). "
+            f"The first is series {series}, sample {sample}: "
+            f"{data_array[series][sample]!r}, which at a slope of "
+            f"{slope[series]!r} and y_offset of {y_offset[series]!r} is code "
+            f"{adc_codes[series, sample]}. Increase that series' slope in "
+            f"header_data or bring the data back within range."
+        )
+
+    return adc_codes.astype(dtype)
 
 
 def _format_exponent_notation(input_number, precision, num_exponent_digits):
@@ -306,18 +346,14 @@ def _read_taffmat_dat(input_dat_file, file_type, number_of_series, slope, y_offs
         N/A
     """
 
-    # Determine if the .dat file saved the data using 2-bytes (int16)
-    # or 4-bytes (int32).
-    if file_type == "INTEGER":
-        data_size = np.int16
-    elif file_type == "LONG":
-        data_size = np.int32
-    else:
-        data_size = np.int16
     # Read the entire file and reshape the data so that each channel/series
     # is in its own row
     with open(input_dat_file, "rb") as datfile:
-        data_array = np.fromfile(datfile, data_size).reshape((-1, number_of_series)).T
+        data_array = (
+            np.fromfile(datfile, _dat_dtype(file_type))
+            .reshape((-1, number_of_series))
+            .T
+        )
 
     return _apply_slope_and_offset(data_array, number_of_series, slope, y_offset)
 
@@ -432,26 +468,20 @@ def _write_taffmat_hdr(header_data, output_hdr_filename):
 
     header_output = _append_windows_newlines(header_output)
 
-    # Write the .hdr file
-    with open(output_hdr_filename, "w") as f_header:
+    # Write the .hdr file. The lines already end in \r\n, so newline=""
+    # stops text mode translating the \n again, which on Windows would end
+    # every line in \r\r\n.
+    with open(output_hdr_filename, "w", newline="") as f_header:
         f_header.writelines(header_output)
 
 
-def _write_taffmat_dat(
-    data_array, number_of_series, slope, y_offset, output_dat_filename
-):
+def _write_taffmat_dat(adc_codes, output_dat_filename):
     """
-    Write the .dat TAFFmat file
-    WARNING: Changes data_array in calling code!!!
+    Write the .dat TAFFmat file from the ADC codes, one series per row,
+    interlacing the series sample by sample.
     """
-
-    # Convert data_array into int16 values by removing the offset
-    # and slope, such that +/-100% = +/-25,000 int16
-    data_array = _remove_slope_and_offset(data_array, number_of_series, slope, y_offset)
-
-    # Write the binary data file.
     with open(output_dat_filename, "wb") as datfile:
-        data_array.T.reshape((-1, number_of_series)).tofile(datfile)
+        adc_codes.T.tofile(datfile)
 
 
 def read_taffmat(input_file):
@@ -521,20 +551,28 @@ def read_taffmat(input_file):
 def write_taffmat(data_array, header_data, output_base_filename):
     """
     Write the TAFFmat .dat and .hdr files
+
+    The data_array is converted to ADC codes of the size the header's
+    file_type calls for (INTEGER or LONG) without being modified. Raises
+    ValueError, and writes nothing, if a value falls outside what those
+    codes can hold at the header's slope and y_offset.
     """
 
     # Determine the output file names
     output_hdr_filename = f"{output_base_filename}.HDR"
     output_dat_filename = f"{output_base_filename}.DAT"
 
-    _write_taffmat_hdr(header_data, output_hdr_filename)
-    _write_taffmat_dat(
+    # Convert before writing either file, so that data which cannot be
+    # stored leaves neither a .hdr nor a .dat behind.
+    adc_codes = _remove_slope_and_offset(
         data_array,
         header_data["number_of_series"],
         header_data["slope"],
         header_data["y_offset"],
-        output_dat_filename,
+        _dat_dtype(header_data["file_type"]),
     )
+    _write_taffmat_hdr(header_data, output_hdr_filename)
+    _write_taffmat_dat(adc_codes, output_dat_filename)
 
 
 def write_taffmat_slice(
@@ -555,20 +593,14 @@ def write_taffmat_slice(
     given header_data is modified.
     """
 
-    # TODO(mdr): Add a check to determine if the data_array is beyond
-    # the range in the header.and if so log it.
-
-    # Since slices are simply views into the original array, we need
-    # to copy the array before performing the ADC conversion required
-    # by the LX-10 when storing data as integers.
-    data_array_copy = data_array.copy()
-
-    # Create copies of the originals. The header is copied rather than
-    # aliased so that describing the slice does not overwrite the caller's
-    # description of the recording; a caller that reads a file, writes a
-    # slice out of it, and then asks the header how long the recording was
-    # would otherwise be handed the length of the slice.
-    sliced_data_array = data_array_copy[:, starting_data_index : ending_data_index + 1]
+    # Slicing takes a view rather than a copy, which is safe because
+    # write_taffmat converts the data into an array of its own. The header is
+    # copied rather than aliased so that describing the slice does not
+    # overwrite the caller's description of the recording; a caller that
+    # reads a file, writes a slice out of it, and then asks the header how
+    # long the recording was would otherwise be handed the length of the
+    # slice.
+    sliced_data_array = data_array[:, starting_data_index : ending_data_index + 1]
     sliced_header_data = header_data.copy()
 
     # Calculate number of samples

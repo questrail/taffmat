@@ -14,6 +14,27 @@ This file contains all notable changes to the [taffmat][] project.
 
 ### Fixed
 
+- `write_taffmat` no longer modifies the `data_array` it is given. It
+  converted the caller's array to ADC codes in place, so a caller that went
+  on analysing the data after writing it, or wrote it a second time, was
+  handed integer codes such as `2959.0` where `0.23672` V had been. The
+  conversion now goes into an array of its own, which also lets
+  `write_taffmat_slice` stop copying the whole recording to protect it.
+- **Behavior change:** `write_taffmat` and `write_taffmat_slice` raise
+  `ValueError` for a value that cannot be stored as an ADC code at the
+  header's `slope` and `y_offset`, and for NaN or infinity, and write neither
+  file. Such values were cast straight to integers, which wraps silently: a
+  channel whose gain had been doubled with `change_slope` wrote 2.82 V that
+  read back as -2.42 V. The message names the series and sample; increase that
+  series' `slope` in the header, or bring the data back within range.
+- Writing a header whose `file_type` is `LONG` writes 4-byte samples. The
+  writer always wrote 2-byte ones, which read back as half as many samples,
+  each assembled from two of the originals. The .dat file is now read and
+  written in little-endian byte order explicitly, as the recorders store it,
+  rather than in the byte order of the machine running taffmat.
+- The .hdr file is written with a single `\r\n` ending each line on Windows.
+  The lines already carried `\r\n` and text mode translated the `\n` again,
+  ending every line in `\r\r\n`.
 - `just add`, `just dev`, `just up`, and `just doc` quote the argument they
   are given. just interpolates an argument straight into the shell line, so
   `just add 'siganalysis>=0.10.0'` ran `uv add siganalysis>=0.10.0`: the `>`
